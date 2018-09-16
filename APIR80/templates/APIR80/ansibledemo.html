@@ -1,0 +1,51 @@
+{% extends 'APIR80/base.html' %}
+{% block title %}
+    Ansible Demo Automation
+{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Automation Demo Ansible</h1>
+    <p class="lead">
+        Ansible demo to deploy different Check Point solution inside Azure, it can deploy:
+        <br />
+        <br />
+        <h2>Check Point:</h2>
+        <ul>
+            <li>Smart Center Server</li>
+            <li>Firewall</li>
+            <li>PC inside the demo environment</li>
+        </ul>
+    </p>
+    <div id="navbarSMS" class="bg-dark collapse" style="">
+        <div class="container">
+            <div class="row">
+                <h3 class="text-white">Smart Center configuration</h3>
+                <br />
+                <br />
+                <div class="container">
+                    <form action="/r80api/extends/ansibledemo/" method="post">
+                        {% csrf_token %}
+                        {{ form1.as_p }}
+                        <input type="submit" value="Submit_SMS">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="navbar navbar-dark bg-dark shadow-sm">
+        <div class="container d-flex justify-content-between">
+            <div class="navbar-brand d-flex align-items-center">
+                <strong>SMART CENTER DEPLOY</strong>
+            </div>
+            <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarSMS" aria-controls="navbarSMS" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </div>
+</div>
+     <form action="/r80api/extends/ansibledemo/" method="post">
+         {% csrf_token %}
+         {{ formGWt.as_p }}
+         <input type="submit" value="Submit_GW">
+     </form>
+{% endblock %}
