@@ -1,0 +1,57 @@
+{% extends 'APIR80/base.html' %}
+{% block title %}
+    API Rule Base Demo
+{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Automation Demo For R80 API</h1>
+    <p class="lead">
+        R80 API demo to deploy Rule bases:
+        <br />
+        <br />
+        <h2>Check Point:</h2>
+        <ul>
+            <li>Security Rules</li>
+            <li>TCP Objects</li>
+            <li>UDP Objects</li>
+        </ul>
+    </p>
+    <div class="card text-center">
+        <div class="card-header bg-info">
+            <h5>FIREWALL RULES</h5>
+        </div>
+        <div class="card-body">
+            <form action="/r80api/extends/rulesdemo/" method="post">
+                {% csrf_token %}
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <label for="{{ rulesform.LayerForm.id_for_label }}">Layer Append</label>{{rulesform.LayerForm}}<br />
+                        {{ R80UsersForm }}
+                    </li>
+                    <li class="list-group-item">
+                        <label for="{{ rulesform.RuleName.id_for_label }}">Rule Name</label>
+                        {{ rulesform.RuleName }}
+                        <label for="{{ rulesform.FWRuleOrigin.id_for_label }}">Dst Origin</label>
+                        {{ rulesform.FWRuleOrigin }}
+                        <label for="{{ rulesform.FwRuleDst.id_for_label }}">Dst Dir</label>
+                        {{ rulesform.FwRuleDst }}
+                        <select name="ProtocolType" id="{{ rulesform.ProtocolType.id_for_label }}">
+                            {% for id, proto in rulesform.fields.ProtocolType.choices %}
+                            <option value="{{ id }}">{{ proto }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="{{ rulesform.FWRulePort.id_for_label }}">Port</label>
+                        {{ rulesform.FWRulePort }}
+                    </li>
+                </ul>
+                <input type="submit" value="SubmitRules">
+            </form>
+        </div>
+    </div>
+</div>
+<!--<form action="/r80api/extends/ansibledemo/" method="post">
+    {% csrf_token %}
+    {{ rulesform.as_table }}
+    <input type="submit" value="Submit_SMS">
+</form>-->
+{% endblock %}
