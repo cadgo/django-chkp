@@ -25,7 +25,7 @@
                 <div class="container">
                     <form action="/r80api/extends/ansibledemo/" method="post">
                         {% csrf_token %}
-                        {{ form1.as_p }}
+                        {{ formsms.as_p }}
                         <input type="submit" value="Submit_SMS">
                     </form>
                 </div>
@@ -42,10 +42,42 @@
             </button>
         </div>
     </div>
+    <div class="card text-center">
+        <div class="card-body">
+            <h5>Status</h5>
+        </div>
+    </div>
+    <div id="navbarFw" class="bg-dark collapse" style="">
+        <div class="container">
+            <div class="row">
+                <h3 class="text-white">Firewall Configuration</h3>
+                <br />
+                <br />
+                <div class="container">
+                    <form action="/r80api/extends/ansibledemo/" method="post">
+                        {% csrf_token %}
+                        {{ formGWt.as_p }}
+                        <input type="submit" value="Submit_GW">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="navbar navbar-dark bg-dark shadow-sm">
+        <div class="container d-flex justify-content-between">
+            <div class="navbar-brand d-flex align-items-center">
+                <strong>FIREWALL DEPLOY</strong>
+            </div>
+            <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarFw" aria-controls="navbarFw" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </div>
+    <div class="card text-center">
+        <div class="card-body">
+            <h5>Status</h5>
+        </div>
+    </div>
+    </div>
 </div>
-     <form action="/r80api/extends/ansibledemo/" method="post">
-         {% csrf_token %}
-         {{ formGWt.as_p }}
-         <input type="submit" value="Submit_GW">
-     </form>
 {% endblock %}
