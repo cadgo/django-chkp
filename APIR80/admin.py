@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import MGMTServer, R80Users
+from .models import *
 from django import forms
 
 
@@ -9,14 +9,21 @@ class ChoiceInline(admin.TabularInline):
 # Register your models here.
 
 class MGMTServerAdminPortal(admin.ModelAdmin):
-    list_display = ('ServerIP', 'Description', 'SupportedVersion')
+    list_display = ('MgmtR80Name','ServerIP', 'Description', 'SupportedVersion')
 
 class R80UsersForm(forms.ModelForm):
     R80Password = forms.CharField(widget=forms.PasswordInput)
+
 class R80UsersAdmin(admin.ModelAdmin):
     form = R80UsersForm
     fieldset = ('UsersID', 'R80User', 'R80Password')
 
+class MGMTServerObjectsAdmin(admin.ModelAdmin):
+    list_display = ('MGMTServerObjectsID', 'MGMTServerFilePathTCPPorts')
+
+class MGMTServerObjectsAdminObjects(admin.ModelAdmin):
+    list_display = ('MGMTServerObjectsNetworksID', 'MGMTServerFilePathNetObjects')
 
 admin.site.register(MGMTServer, MGMTServerAdminPortal)
 admin.site.register(R80Users, R80UsersAdmin)
+admin.site.register(MGMTServerObjects, MGMTServerObjectsAdmin)

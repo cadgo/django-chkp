@@ -21,12 +21,22 @@
             <h5>FIREWALL RULES</h5>
         </div>
         <div class="card-body">
-            <form action="/r80api/extends/rulesdemo/" method="post">
+ <!--           <form action="/r80api/extends/rulesdemo/" method="post">
                 {% csrf_token %}
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
-                        <label for="{{ rulesform.LayerForm.id_for_label }}">Layer Append</label>{{rulesform.LayerForm}}<br />
-                        {{ R80UsersForm }}
+                        <label for="{{ rulesform.LayerForm.id_for_label }}">Layer Append</label>{{ rulesform.LayerForm }}<br />
+  &lt;!&ndash;                      <select name="UsersFormChoice" id="{{ rulseform.UsersFormChoice.id_for_label }}">
+                            {% for id, user in rulesform.fields.UsersFormChoice.choices %}
+                                <option value="{{ id }}">{{ user }}</option>
+                            {% endfor %}
+                        </select>&ndash;&gt;
+                       &lt;!&ndash; {{ rulesform.fileds.MgmtFormChoice.choices }}
+                        <select name="MgmtFormChoice" id="{{ rulesform.MgmtFormChoice.id_for_labbel }}">
+                            {% for id, ServerIP in rulesform.fields.MgmtFormChoice.choices %}
+                                <option value="{{ id }}">{{ ServerIP }}</option>
+                            {% endfor %}
+                        </select>&ndash;&gt;
                     </li>
                     <li class="list-group-item">
                         <label for="{{ rulesform.RuleName.id_for_label }}">Rule Name</label>
@@ -45,13 +55,13 @@
                     </li>
                 </ul>
                 <input type="submit" value="SubmitRules">
-            </form>
+            </form>-->
         </div>
     </div>
 </div>
-<!--<form action="/r80api/extends/ansibledemo/" method="post">
+<form action="/r80api/extends/rulesdemo/" method="post">
     {% csrf_token %}
     {{ rulesform.as_table }}
     <input type="submit" value="Submit_SMS">
-</form>-->
+</form>
 {% endblock %}

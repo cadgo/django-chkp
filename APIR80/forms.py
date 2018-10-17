@@ -22,19 +22,33 @@ class AnsibleFWDeploy(forms.Form):
     FwDeployFormHidden = forms.CharField(widget=forms.HiddenInput, initial='True')
 
 
+# class ModelsUsersAndMgmtServer(forms.Form):
+#     UsersQuery = tuple(R80Users.objects.values_list('id', 'R80User'))
+#     MgmtQuery = tuple(MGMTServer.objects.values_list('id', 'ServerIP'))
+#     UsersFormChoice = forms.MultipleChoiceField(label='Users', widget=forms.Select, choices=UsersQuery)
+#     MgmtFromChoice = forms.MultipleChoiceField(label='SMSServer', widget=forms.Select, choices=MgmtQuery)
+
 class RuleBasesForm(forms.Form):
-    ProtocolChoice = (('tcp', 'TCP'), ('udp', 'UDP'),)
+    ProtocolChoice = (('tcp', 'tcp'), ('udp', 'udp'),)
     LayerForm = forms.CharField(label='Layer to Use', max_length=20)
     RuleName = forms.CharField(label='rule name', max_length=20, strip=True)
     FWRuleOrigin = forms.GenericIPAddressField(label='Src IP', protocol="IPv4")
     FwRuleDst = forms.GenericIPAddressField(label='Dst IP', protocol="IPv4")
-    FWRulePort = forms.IntegerField(min_value=1, max_value=65525)
-    ProtocolType = forms.MultipleChoiceField(widget=forms.Select,choices=ProtocolChoice)
+    #FWRulePort = forms.IntegerField(min_value=1, max_value=65525)
+    FWRulePort = forms.ChoiceField(label='Port')
+    ProtocolType = forms.ChoiceField(choices=ProtocolChoice)
+    #UsersFormChoice = forms.ChoiceField(label='Users', choices=UsersQuery)
+    #MgmtFormChoice = forms.ChoiceField(label='SMSServer', choices=MgmtQuery)
 
+    def __init__(self, tcplist, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['FWRulePort'].choices = tcplist
+        print('Incializando el formulario')
 
-class ModelsUsersAndMgmtServer(forms.Form):
-    UsersQuery = tuple(R80Users.objects.values_list('id', 'R80User'))
+class ChoseConsoleForm(forms.Form):
+    #UsersQuery = tuple(R80Users.objects.values_list('id', 'R80User'))
+    #MgmtQuery = tuple(MGMTServer.objects.values_list('id', 'ServerIP'))
     MgmtQuery = tuple(MGMTServer.objects.values_list('id', 'ServerIP'))
-    UsersFormChoice = forms.MultipleChoiceField(label='Users', widget=forms.Select, choices=UsersQuery)
-    MgmtFromChoice = forms.MultipleChoiceField(label='SMSServer', widget=forms.Select, choices=MgmtQuery)
+    MgmtFormChoice = forms.ChoiceField(label='SMSServer', choices=MgmtQuery)
+
 

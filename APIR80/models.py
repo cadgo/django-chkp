@@ -1,19 +1,50 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password
+from django.core.validators import MaxValueValidator
+from chkp import settings
 
 # Create your models here.
 class MGMTServer(models.Model):
     MgmtR80Name = models.CharField(max_length=250)
     ServerIP = models.GenericIPAddressField()
-    Description = models.CharField(max_length=500)
+    Description = models.TextField(max_length=500)
     SupportedVersion = (('R80', 'R80'),
                         ('R80.10', 'R80.10'),)
     MgmtR80VersionsSupported = models.CharField(max_length=10, choices=SupportedVersion,default='R80.10')
     MGMTR80IsAlive = models.BooleanField(default=True)
     MgmtFingerPrintAPI = models.CharField(max_length=100, default='not defined')
+    MgmtPort = models.PositiveIntegerField(validators=[MaxValueValidator(65525)], default=443)
+    LastPublishSession = models.IntegerField(default=1)
 
     def __str__(self):
         return 'MGMTName {} Address {}'.format(self.MgmtR80Name, self.ServerIP)
+
+class MGMTServerObjects(models.Model):
+    MGMTServerObjectsID = models.ForeignKey(MGMTServer, on_delete=models.CASCADE)
+    MGMTServerFilePathTCPPorts = models.CharField(max_length=250, default='{}/APIR80/tmp/chkpports.txt'.format(settings.BASE_DIR))
+    MGMTServerFilePathNetObjects = models.CharField(max_length=250,default='{}/APIR80/tmp/chkpobjects.txt'.format(settings.BASE_DIR))
+
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     self.filelist = [self.MGMTServerFilePathTCPPorts, self.MGMTServerFilePathNetObjects]
+    #     self.index = -1
+    #
+    # def __iter__(self):
+    #     return self.filelist[self.index]
+    #
+    # def __next__(self):
+    #     self.index +=1
+    #     if self.index == len(self.filelist):
+    #         self.index = 0
+    #         raise StopIteration
+    #
+    #     return self.filelist[self.index]
+
+
+
+# class MGMTServerObjectsNetworks(models.Model):
+#     MGMTServerObjectsNetworksID = models.ForeignKey(MGMTServer, on_delete=models.CASCADE)
+#     MGMTServerFilePathNetObjects = models.CharField(max_length=250, default='{}/APIR80/tmp/chkpobjects.txt'.format(settings.BASE_DIR))
 
 class R80Users(models.Model):
     UsersID = models.ForeignKey(MGMTServer, on_delete=models.CASCADE)
