@@ -90,16 +90,31 @@ class RulesDemo(LoginRequiredMixin, View):
         conn.LogOutCheckPoint()
 
     def GetListTCPObjects(self):
+        """"Validar que no tengan cero estos valores"""
         rdata =[]
         total = 0
         with open(self.ServerInfo['MgmtObjects'].MGMTServerFilePathTCPPorts) as f:
             data = json.load(f)
         total = data['total']
-        print('total {}'.format(total))
+        if total == 0:
+            return rdata.append(['',''])
         for i in range(total):
             # print(data['objects'][i]['name'])
             # print(data['objects'][i]['port'])
             rdata.append([data['objects'][i]['name'],data['objects'][i]['port']])
+        return rdata
+
+    def GetListHostsObjects(self):
+        """"Validar que no tengan cero estos valores"""
+        rdata = []
+        total = 0
+        with open(self.ServerInfo['MgmtObjects'].MGMTServerFilePathNetObjects) as f:
+            data = json.load(f)
+        total = data['total']
+        if total == 0:
+            return rdata.append(['',''])
+        for i in range(total):
+            rdata.append([data['objects'][i]['name'],data['objects'][i]['ipv4-address']])
         return rdata
 
     def get(self, request, *args, **kwargs):
@@ -111,26 +126,34 @@ class RulesDemo(LoginRequiredMixin, View):
         self.ServerInfo['MgmtServerUser'] = models.R80Users.objects.get(pk=MgmtServerToUse)
         self.ServerInfo['MgmtObjects'] = models.MGMTServerObjects.objects.get(MGMTServerObjectsID=MgmtServerToUse)
         self.__CheckFilesAndData()
-        print(self.GetListTCPObjects())
-        return render(request, self.template_name, {'rulesform': self.form_class(self.GetListTCPObjects())})
+        return render(request, self.template_name, {'rulesform': self.form_class(self.GetListTCPObjects(),
+                                                                                 self.GetListHostsObjects())})
 
     def post(self, request, *args, **kwargs):
         print(request.POST)
-        form = forms.RuleBasesForm(request.POST)
+        form = self.form_class(data=request.POST, tcplist=self.GetListTCPObjects()
+                               , hostlists=self.GetListHostsObjects())
         if form.is_valid():
             print("Es valida")
-            n = tasks.CheckPointAPI('104.154.66.152', 443)
-            print("login")
-            n.ChkpLogin('api_user', 'vpn123')
-            #n.ChkpAddAccessLayer('test1')
-            #n.ChkpSetLayerDefaultRuleToAccept('Cleanup rule', 'test1')
-            #n.ChkpPublish()
-            n.ChkpShowServicesTCP()
-            n.LogOutCheckPoint()
+            conn = tasks.CheckPointAPI(self.ServerInfo['MgmtServerData'].ServerIP,
+                                       self.ServerInfo['MgmtServerData'].MgmtPort)
+            conn.ChkpLogin(self.ServerInfo['MgmtServerUser'].R80User, self.ServerInfo['MgmtServerUser'].R80Password)
+            conn.ChkpAddAccessLayer(request.POST.get('LayerForm'))
+            conn.ChkpSetLayerDefaultRuleToAccept('Cleanup rule', request.POST.get('LayerForm'))
+            conn.ChkpAddAccesRule(request.POST.get('LayerForm'),
+                                  request.POST.get('RuleName'),
+                                  request.POST.get('FWRuleOrigin'),
+                                  request.POST.get('FwRuleDst'),
+                                  request.POST.get('FWRulePort'),
+                                  request.POST.get('ActionRule'),
+                                  request.POST.get('LogRule'))
+            conn.ChkpPublish()
+            conn.LogOutCheckPoint()
         else:
             print("No es valida")
             SuspiciousOperation("Invalid request: not able to process the form")
-        return render(request, self.template_name, self.RulesDemoForms)
+        return render(request, self.template_name, {'rulesform': self.form_class(self.GetListTCPObjects(),
+                                                                                 self.GetListHostsObjects())})
 
 
 class AnsibleDemo(LoginRequiredMixin, View):

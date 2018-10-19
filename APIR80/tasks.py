@@ -147,6 +147,27 @@ class CheckPointAPI():
         self.__ChkpCheckHTTPReturnCode(conn)
         print("bbbbb {}".format(conn.read().decode()))
 
+    def ChkpAddAccesRule(self, layer, name, source,
+                         destination, service, action, track):
+        PathAppend = "/web_api/add-access-rule"
+        data = {
+            'layer': layer,
+            'position': 'top',
+            'name': name,
+            'source': source,
+            'destination': destination,
+            'service': service,
+            'action': action,
+            'track': {'type': track}
+        }
+        jdata = json.JSONEncoder().encode(data)
+        self.__ChkpValidateSID()
+        self.__ChkpValidConnection(PathAppend, jdata)
+        conn = self.connection.getresponse()
+        self.__ChkpCheckHTTPReturnCode(conn)
+        response = json.loads(conn.read().decode())
+        return response
+
 
     def ChkpShowServicesTCP(self, offset=0, limit=217):
         PathAppend = '/web_api/show-services-tcp'

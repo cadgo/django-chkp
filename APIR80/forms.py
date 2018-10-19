@@ -30,20 +30,26 @@ class AnsibleFWDeploy(forms.Form):
 
 class RuleBasesForm(forms.Form):
     ProtocolChoice = (('tcp', 'tcp'), ('udp', 'udp'),)
+    ActionChoice = (('Accept', 'Accept'), ('Drop', 'Drop'),)
+    LogChoice = (('Log', 'Log'), ('Full Log', 'Full Log'),('Network Log', 'Network Log'), ('None', 'None'),)
     LayerForm = forms.CharField(label='Layer to Use', max_length=20)
     RuleName = forms.CharField(label='rule name', max_length=20, strip=True)
-    FWRuleOrigin = forms.GenericIPAddressField(label='Src IP', protocol="IPv4")
-    FwRuleDst = forms.GenericIPAddressField(label='Dst IP', protocol="IPv4")
+    FWRuleOrigin = forms.ChoiceField(label='Src IP')
+    FwRuleDst = forms.ChoiceField(label='Dst IP')
     #FWRulePort = forms.IntegerField(min_value=1, max_value=65525)
     FWRulePort = forms.ChoiceField(label='Port')
     ProtocolType = forms.ChoiceField(choices=ProtocolChoice)
+    ActionRule = forms.ChoiceField(label='Action', choices=ActionChoice)
+    LogRule = forms.ChoiceField(label='Log', choices = LogChoice)
     #UsersFormChoice = forms.ChoiceField(label='Users', choices=UsersQuery)
     #MgmtFormChoice = forms.ChoiceField(label='SMSServer', choices=MgmtQuery)
 
-    def __init__(self, tcplist, *args, **kwargs):
+    def __init__(self, tcplist, hostlists, *args, **kwargs):
+        #Validar que las listas vengan con información que no esten en cero
         super().__init__(*args, **kwargs)
         self.fields['FWRulePort'].choices = tcplist
-        print('Incializando el formulario')
+        self.fields['FWRuleOrigin'].choices = hostlists
+        self.fields['FwRuleDst'].choices = hostlists
 
 class ChoseConsoleForm(forms.Form):
     #UsersQuery = tuple(R80Users.objects.values_list('id', 'R80User'))
