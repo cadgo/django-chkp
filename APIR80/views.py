@@ -62,14 +62,22 @@ class RulesDemo(LoginRequiredMixin, View):
         conn = tasks.CheckPointAPI(self.ServerInfo['MgmtServerData'].ServerIP,
                                    self.ServerInfo['MgmtServerData'].MgmtPort)
         fileTCPPorts = Path(self.ServerInfo['MgmtObjects'].MGMTServerFilePathTCPPorts)
+        fileUDPPorts= Path(self.ServerInfo['MgmtObjects'].MGMTServerFilePathUDPPorts)
         fileObjects = Path(self.ServerInfo['MgmtObjects'].MGMTServerFilePathNetObjects)
         #Si no existen los archivos
+        print(fileUDPPorts)
         conn.ChkpLogin(self.ServerInfo['MgmtServerUser'].R80User, self.ServerInfo['MgmtServerUser'].R80Password)
-        if not fileTCPPorts.is_file() and not fileObjects.is_file():
+        if not(fileTCPPorts.is_file() and fileObjects.is_file() \
+                and fileUDPPorts.is_file()):
+            #ENTRA CON TRUE
             fileTCPPorts.touch()
             fileObjects.touch()
-            tcpPorts = json.dumps(conn.ChkpShowServicesTCP())
+            fileUDPPorts.touch()
+            #tcpPorts = json.dumps(conn.ChkpShowServicesTCP())
+            tcpPorts = json.dumps(conn.ChkpShowFullServicesTCP())
+            udpPorts = json.dumps(conn.ChkpShowFullServicesUDP())
             fileTCPPorts.write_text(tcpPorts)
+            fileUDPPorts.write_text(udpPorts)
             hosts = json.dumps(conn.ChkpShowHosts())
             fileObjects.write_text(hosts)
         else:
@@ -77,10 +85,14 @@ class RulesDemo(LoginRequiredMixin, View):
             DBChkpVersion = self.ServerInfo['MgmtServerData'].LastPublishSession
             RemoteVersion = conn.ChkpShowLastPublishedSession()
             RemoteVersion = RemoteVersion['publish-time']['posix']
+            #Si las versiones de Base de datos son distintas vamos por todo nuevamente
             if DBChkpVersion != RemoteVersion:
                 print('Versiones diferentes actualizando la versiones')
-                tcpPorts = json.dumps(conn.ChkpShowServicesTCP())
+                #tcpPorts = json.dumps(conn.ChkpShowServicesTCP())
+                tcpPorts = json.dumps(conn.ChkpShowFullServicesTCP())
+                udpPorts = json.dumps(conn.ChkpShowFullServicesUDP())
                 fileTCPPorts.write_text(tcpPorts)
+                fileUDPPorts.write_text(udpPorts)
                 hosts = json.dumps(conn.ChkpShowHosts())
                 fileObjects.write_text(hosts)
                 self.ServerInfo['MgmtServerData'].LastPublishSession = RemoteVersion
@@ -101,7 +113,22 @@ class RulesDemo(LoginRequiredMixin, View):
         for i in range(total):
             # print(data['objects'][i]['name'])
             # print(data['objects'][i]['port'])
-            rdata.append([data['objects'][i]['name'],data['objects'][i]['port']])
+            rdata.append([data['objects'][i]['name'],'tcp:'+data['objects'][i]['port']])
+        return rdata
+
+    def GetListUDPObjects(self):
+        """"Validar que no tengan cero estos valores"""
+        rdata =[]
+        total = 0
+        with open(self.ServerInfo['MgmtObjects'].MGMTServerFilePathUDPPorts) as f:
+            data = json.load(f)
+        total = data['total']
+        if total == 0:
+            return rdata.append(['',''])
+        for i in range(total):
+            # print(data['objects'][i]['name'])
+            # print(data['objects'][i]['port'])
+            rdata.append([data['objects'][i]['name'],'udp:'+data['objects'][i]['port']])
         return rdata
 
     def GetListHostsObjects(self):
@@ -126,13 +153,13 @@ class RulesDemo(LoginRequiredMixin, View):
         self.ServerInfo['MgmtServerUser'] = models.R80Users.objects.get(pk=MgmtServerToUse)
         self.ServerInfo['MgmtObjects'] = models.MGMTServerObjects.objects.get(MGMTServerObjectsID=MgmtServerToUse)
         self.__CheckFilesAndData()
-        return render(request, self.template_name, {'rulesform': self.form_class(self.GetListTCPObjects(),
+        return render(request, self.template_name, {'rulesform': self.form_class(self.GetListTCPObjects(), self.GetListUDPObjects(),
                                                                                  self.GetListHostsObjects())})
 
     def post(self, request, *args, **kwargs):
         print(request.POST)
-        form = self.form_class(data=request.POST, tcplist=self.GetListTCPObjects()
-                               , hostlists=self.GetListHostsObjects())
+        form = self.form_class(data=request.POST, tcplist=self.GetListTCPObjects(), udplist=self.GetListUDPObjects(),
+                               hostlists=self.GetListHostsObjects())
         if form.is_valid():
             print("Es valida")
             conn = tasks.CheckPointAPI(self.ServerInfo['MgmtServerData'].ServerIP,
@@ -152,7 +179,7 @@ class RulesDemo(LoginRequiredMixin, View):
         else:
             print("No es valida")
             SuspiciousOperation("Invalid request: not able to process the form")
-        return render(request, self.template_name, {'rulesform': self.form_class(self.GetListTCPObjects(),
+        return render(request, self.template_name, {'rulesform': self.form_class(self.GetListTCPObjects(), self.GetListUDPObjects(),
                                                                                  self.GetListHostsObjects())})
 
 

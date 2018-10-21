@@ -192,6 +192,47 @@ class CheckPointAPI():
         response = json.loads(conn.read().decode())
         return response
 
+    def ChkpShowFullServicesTCP(self):
+        data = self.ChkpShowServicesTCP()
+        total = data['total']
+        if total == 0:
+            return data
+        else:
+            data = self.ChkpShowServicesTCP(0,total)
+            return data
+
+    def ChkpShowServicesUDP(self, offset=0, limit=94):
+        PathAppend = '/web_api/show-services-udp'
+        data = {
+            'limit': limit,
+            'offset': offset,
+            'details-level':  "standard"
+        }
+        jdata = json.JSONEncoder().encode(data)
+        self.__ChkpValidateSID()
+        # for i in range(retries):
+        #     try:
+        #         self.connection.request('POST', PathAppend, headers=self.Headers, body=jdata)
+        #     except http.client.RemoteDisconnected:
+        #         if i < retries:
+        #             continue
+        #         else:
+        #             raise Http404('Max Retries for Show Services')
+        self.__ChkpValidConnection(PathAppend, jdata)
+        conn = self.connection.getresponse()
+        self.__ChkpCheckHTTPReturnCode(conn)
+        response = json.loads(conn.read().decode())
+        return response
+
+    def ChkpShowFullServicesUDP(self):
+        data = self.ChkpShowServicesUDP()
+        total = data['total']
+        if total == 0:
+            return data
+        else:
+            data = self.ChkpShowServicesUDP(0,total)
+            return data
+
     def ChkpShowHosts(self, offset=0, limit=217):
         PathAppend = '/web_api/show-hosts'
         data = {

@@ -22,6 +22,7 @@ class MGMTServer(models.Model):
 class MGMTServerObjects(models.Model):
     MGMTServerObjectsID = models.ForeignKey(MGMTServer, on_delete=models.CASCADE)
     MGMTServerFilePathTCPPorts = models.CharField(max_length=250, default='{}/APIR80/tmp/chkpports.txt'.format(settings.BASE_DIR))
+    MGMTServerFilePathUDPPorts = models.CharField(max_length=250, default='{}/APIR80/tmp/chkpudpports.txt'.format(settings.BASE_DIR))
     MGMTServerFilePathNetObjects = models.CharField(max_length=250,default='{}/APIR80/tmp/chkpobjects.txt'.format(settings.BASE_DIR))
 
     # def __init__(self, *args, **kwargs):
