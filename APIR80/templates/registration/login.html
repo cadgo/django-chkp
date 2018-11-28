@@ -1,17 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
 {% extends 'APIR80/base.html' %}
-{% block navbarOperative %}
-{% endblock %}
-{% block title %}
-Login
-{% endblock %}
-{% block description %}
-    <p>Login Page</p>
-{% endblock %}
 {% block content %}
 <div class="container">
-    <h1 class="form-heading">Autentication</h1>
     {% if form.errors %}
     <div class="allert alert-warning">
         <stong><p>Your username and password didn't match. Please try again.</p></stong>
@@ -31,19 +20,18 @@ Login
     <div class="login-form">
         <div class="main-div">
             <div class="panel">
-                <h2>Admin Login</h2>
-                <p>Enter your user</p>
+                <h2 class="text-center">Admin Login</h2>
             </div>
             <form method="post" action="{% url 'login' %}">
              {% csrf_token %}
                 <div class="form-group">
                     <!--<input typer="user" class="form-control" id="userID" placeholder="User Login">-->
-                    <td>{{ form.username.label_tag }}</td>
-                    <td>{{ form.username }}</td>
+                    {{ form.username.label_tag }}
+                    {{ form.username }}
                 </div>
                 <div class="form-group">
-                    <td>{{ form.password.label_tag }}</td>
-                    <td>{{ form.password }}</td>
+                    {{ form.password.label_tag }}
+                    {{ form.password }}
                 </div>
                 <button type="submit" value="login" class="btn btn-primary">Login</button>
                 <input type="hidden" name="next" value="{{ next }}"/>
@@ -51,51 +39,5 @@ Login
         </div>
     </div>
 </div>
-<!--{% if form.errors %}-->
-<!--<div class="alert alert-warning">-->
-    <!--<stong><p>Your username and password didn't match. Please try again.</p></stong>-->
-<!--</div>-->
-<!--{% endif %}-->
-
-<!--{% if next %}-->
-    <!--{% if user.is_authenticated %}-->
-    <!--<div class="alert alert-info">-->
-        <!--<p><strong>Your account doesn't have access to this page</strong>. To proceed,-->
-    <!--please login with an account that has access.</p>-->
-    <!--</div>-->
-    <!--{% else %}-->
-    <!--<p>Please login to see this page.</p>-->
-    <!--{% endif %}-->
-<!--{% endif %}-->
-<!--<div class="row">-->
-    <!--<div class="col-sm-4"></div>-->
-    <!--<div class="col-sm-4">-->
-        <!--<div class="panel panel-default">-->
-            <!--<div class="panel-heading"> Login </div>-->
-            <!--<div class="panel-body">-->
-                <!--<form method="post" action="{% url 'login' %}">-->
-            <!--{% csrf_token %}-->
-            <!--<div>-->
-                <!--<td>{{ form.username.label_tag }}</td>-->
-                <!--<td>{{ form.username }}</td>-->
-            <!--</div>-->
-            <!--<div>-->
-                <!--<td>{{ form.password.label_tag }}</td>-->
-                <!--<td>{{ form.password }}</td>-->
-            <!--</div>-->
-            <!--<div>-->
-                <!--<input type="submit" value="login" />-->
-            <!--<input type="hidden" name="next" value="{{ next }}" />-->
-            <!--</div>-->
-            <!--</form>-->
-            <!--{# Assumes you setup the password_reset view in your URLconf #}-->
-            <!--<p><a href="{% url 'password_reset' %}">Lost password?</a></p>-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
-    <!--<div class="col-sm-4"></div>-->
-<!--</div>-->
 {% endblock %}
-{% block footer %}
-{% endblock %}
-</html>
+{% block footer %}{% endblock %}

@@ -192,6 +192,30 @@ class CheckPointAPI():
         response = json.loads(conn.read().decode())
         return response
 
+    def ChkpShowNetworks(self, offset=0, limit=217):
+        PathAppend = '/web_api/show-networks'
+        data = {
+            'limit': limit,
+            'offset': offset,
+            'details-level':  "standard"
+        }
+        jdata = json.JSONEncoder().encode(data)
+        self.__ChkpValidateSID()
+        self.__ChkpValidConnection(PathAppend, jdata)
+        conn = self.connection.getresponse()
+        self.__ChkpCheckHTTPReturnCode(conn)
+        response = json.loads(conn.read().decode())
+        return response
+
+    def ChkpShowFullNetworks(self):
+        data = self.ChkpShowNetworks()
+        total = data['total']
+        if total == 0:
+            return data
+        else:
+            data = self.ChkpShowNetworks(0,total)
+            return data
+
     def ChkpShowFullServicesTCP(self):
         data = self.ChkpShowServicesTCP()
         total = data['total']
@@ -247,6 +271,15 @@ class CheckPointAPI():
         self.__ChkpCheckHTTPReturnCode(conn)
         response = json.loads(conn.read().decode())
         return response
+
+    def ChkpShowFullHosts(self):
+        data = self.ChkpShowHosts()
+        total = data['total']
+        if total == 0:
+            return data
+        else:
+            data = self.ChkpShowHosts(0,total)
+            return data
 
     def ChkpShowLastPublishedSession(self):
         PathAppend = "/web_api/show-last-published-session"

@@ -14,7 +14,7 @@
                         <p class="card-text">Demostración de orquestación con tecnología ansible. Ansible permite de forma remota configurar los equipos además de integrar múltiples tecnologías</p>
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="btn-group">
-                                <form action="ansibledemo/" method="get">
+                                <form action="{% url 'ansibledemo' %}" method="get">
                                 <button class="btn btn-sm btn-outline-secondary" type="submit">Ejecutar</button>
                                 </form>
                             </div>
@@ -30,7 +30,7 @@
                         <p class="card-text">Demostraccion de generacion de reglas de seguridad a traves de la API de R80</p>
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="btn-group">
-                                <form action="rulesdemo/" method="get">
+                                <form action="{% url 'rulesdemo' %}" method="get">
                                     {{ form.as_p }}
                                     <input class="btn btn-sm btn-outline-secondary" type="submit" value="Ejecutar">
                                 </form>

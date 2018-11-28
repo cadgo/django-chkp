@@ -9,23 +9,25 @@ from django.shortcuts import redirect
 from pathlib import Path
 import json
 
-class LoginIndex(generic.ListView, LoginRequiredMixin):
+class LoginIndex(generic.ListView):
     model = models.R80Users
-    template_name = 'APIR80/index.html'
+    #template_name = 'APIR80/index.html'
+    template_name = 'registration/login.html'
 
 
-# Create your views here.
-def index2(request):
-    print(request.user.is_authenticated)
-    if request.user.is_authenticated:
-        return render(request, 'APIR80/extend.html')
-    return render(request, 'APIR80/index.html')
 
-def extends(request):
-    if request.user.is_authenticated:
-        return render(request, 'APIR80/extend.html')
-    else:
-        return render(request, 'APIR80/index.html')
+# # Create your views here.
+# def index2(request):
+#     print(request.user.is_authenticated)
+#     if request.user.is_authenticated:
+#         return render(request, 'APIR80/extend.html')
+#     return render(request, 'APIR80/index.html')
+#
+# def extends(request):
+#     if request.user.is_authenticated:
+#         return render(request, 'APIR80/extend.html')
+#     else:
+#         return render(request, 'APIR80/index.html')
 
 
 class AnsibleDemo2(LoginRequiredMixin, generic.ListView):
@@ -64,22 +66,26 @@ class RulesDemo(LoginRequiredMixin, View):
         fileTCPPorts = Path(self.ServerInfo['MgmtObjects'].MGMTServerFilePathTCPPorts)
         fileUDPPorts= Path(self.ServerInfo['MgmtObjects'].MGMTServerFilePathUDPPorts)
         fileObjects = Path(self.ServerInfo['MgmtObjects'].MGMTServerFilePathNetObjects)
+        fileNetworks = Path(self.ServerInfo['MgmtObjects'].MGMTServerFilePathNetworksObjects)
         #Si no existen los archivos
         print(fileUDPPorts)
         conn.ChkpLogin(self.ServerInfo['MgmtServerUser'].R80User, self.ServerInfo['MgmtServerUser'].R80Password)
         if not(fileTCPPorts.is_file() and fileObjects.is_file() \
-                and fileUDPPorts.is_file()):
+                and fileUDPPorts.is_file() and fileNetworks.is_file()):
             #ENTRA CON TRUE
             fileTCPPorts.touch()
             fileObjects.touch()
             fileUDPPorts.touch()
+            fileNetworks.touch()
             #tcpPorts = json.dumps(conn.ChkpShowServicesTCP())
             tcpPorts = json.dumps(conn.ChkpShowFullServicesTCP())
             udpPorts = json.dumps(conn.ChkpShowFullServicesUDP())
             fileTCPPorts.write_text(tcpPorts)
             fileUDPPorts.write_text(udpPorts)
-            hosts = json.dumps(conn.ChkpShowHosts())
+            hosts = json.dumps(conn.ChkpShowFullHosts())
             fileObjects.write_text(hosts)
+            networks = json.dumps(conn.ChkpShowFullNetworks())
+            fileNetworks.write_text(networks)
         else:
             #Existen los archivos tenemos que verificar la ultima version de la API si no actualizarlos
             DBChkpVersion = self.ServerInfo['MgmtServerData'].LastPublishSession
@@ -93,8 +99,10 @@ class RulesDemo(LoginRequiredMixin, View):
                 udpPorts = json.dumps(conn.ChkpShowFullServicesUDP())
                 fileTCPPorts.write_text(tcpPorts)
                 fileUDPPorts.write_text(udpPorts)
-                hosts = json.dumps(conn.ChkpShowHosts())
+                hosts = json.dumps(conn.ChkpShowFullHosts())
                 fileObjects.write_text(hosts)
+                networks = json.dumps(conn.ChkpShowFullNetworks())
+                fileNetworks.write_text(networks)
                 self.ServerInfo['MgmtServerData'].LastPublishSession = RemoteVersion
                 self.ServerInfo['MgmtServerData'].save()
             else:
@@ -144,22 +152,42 @@ class RulesDemo(LoginRequiredMixin, View):
             rdata.append([data['objects'][i]['name'],data['objects'][i]['ipv4-address']])
         return rdata
 
+
+    def GetListNetworkObjects(self):
+        #Solo procesa redes en IPv4 las de IPv6 las remueve
+        """"Validar que no tengan cero estos valores"""
+        rdata = []
+        total = 0
+        with open(self.ServerInfo['MgmtObjects'].MGMTServerFilePathNetworksObjects) as f:
+            data = json.load(f)
+        total = data['total']
+        if total == 0:
+            return rdata.append(['',''])
+        print(data)
+        for i in range(total):
+            try:
+                rdata.append([data['objects'][i]['name'],data['objects'][i]['subnet4']])
+            except KeyError:
+                continue
+            #rdata.append([data['objects'][i]['name'], ['prueba']])
+        return rdata
+
     def get(self, request, *args, **kwargs):
         MgmtServerToUse = request.GET.get('MgmtFormChoice')
         if MgmtServerToUse == None:
             return redirect('extends')
         MgmtServerToUse = int(MgmtServerToUse)
         self.ServerInfo['MgmtServerData'] = models.MGMTServer.objects.get(pk=MgmtServerToUse)
-        self.ServerInfo['MgmtServerUser'] = models.R80Users.objects.get(pk=MgmtServerToUse)
+        self.ServerInfo['MgmtServerUser'] = models.R80Users.objects.get(UsersID=MgmtServerToUse)
         self.ServerInfo['MgmtObjects'] = models.MGMTServerObjects.objects.get(MGMTServerObjectsID=MgmtServerToUse)
         self.__CheckFilesAndData()
         return render(request, self.template_name, {'rulesform': self.form_class(self.GetListTCPObjects(), self.GetListUDPObjects(),
-                                                                                 self.GetListHostsObjects())})
+                                                                                 self.GetListHostsObjects(),
+                                                                                 self.GetListNetworkObjects())})
 
     def post(self, request, *args, **kwargs):
         print(request.POST)
-        form = self.form_class(data=request.POST, tcplist=self.GetListTCPObjects(), udplist=self.GetListUDPObjects(),
-                               hostlists=self.GetListHostsObjects())
+        form = self.form_class(data=request.POST, tcplist=self.GetListTCPObjects(), udplist=self.GetListUDPObjects(),hostlists=self.GetListHostsObjects(), networks=self.GetListNetworkObjects())
         if form.is_valid():
             print("Es valida")
             conn = tasks.CheckPointAPI(self.ServerInfo['MgmtServerData'].ServerIP,
@@ -180,7 +208,8 @@ class RulesDemo(LoginRequiredMixin, View):
             print("No es valida")
             SuspiciousOperation("Invalid request: not able to process the form")
         return render(request, self.template_name, {'rulesform': self.form_class(self.GetListTCPObjects(), self.GetListUDPObjects(),
-                                                                                 self.GetListHostsObjects())})
+                                                                                 self.GetListHostsObjects(),
+                                                                                 self.GetListNetworkObjects())})
 
 
 class AnsibleDemo(LoginRequiredMixin, View):

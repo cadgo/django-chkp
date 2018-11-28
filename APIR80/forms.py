@@ -1,6 +1,12 @@
 from .models import R80Users, MGMTServer
 from django import forms
+from django.contrib.auth.forms import AuthenticationForm
 
+class MyLoginForm(AuthenticationForm):
+    username = forms.CharField(max_length=254, widget=forms.TextInput(attrs={'class': 'form-control',
+                                                                             'placeholder': 'Enter UserName'}))
+    password = forms.CharField(label="Password", widget=forms.PasswordInput(attrs={'class': 'form-control',
+                                                                             'placeholder': 'Enter Password'}))
 
 class R80UsersForm(forms.ModelForm):
     R80Password = forms.CharField(widget=forms.PasswordInput)
@@ -22,12 +28,6 @@ class AnsibleFWDeploy(forms.Form):
     FwDeployFormHidden = forms.CharField(widget=forms.HiddenInput, initial='True')
 
 
-# class ModelsUsersAndMgmtServer(forms.Form):
-#     UsersQuery = tuple(R80Users.objects.values_list('id', 'R80User'))
-#     MgmtQuery = tuple(MGMTServer.objects.values_list('id', 'ServerIP'))
-#     UsersFormChoice = forms.MultipleChoiceField(label='Users', widget=forms.Select, choices=UsersQuery)
-#     MgmtFromChoice = forms.MultipleChoiceField(label='SMSServer', widget=forms.Select, choices=MgmtQuery)
-
 class RuleBasesForm(forms.Form):
     ActionChoice = (('Accept', 'Accept'), ('Drop', 'Drop'),)
     LogChoice = (('Log', 'Log'), ('Full Log', 'Full Log'),('Network Log', 'Network Log'), ('None', 'None'),)
@@ -42,12 +42,12 @@ class RuleBasesForm(forms.Form):
     #UsersFormChoice = forms.ChoiceField(label='Users', choices=UsersQuery)
     #MgmtFormChoice = forms.ChoiceField(label='SMSServer', choices=MgmtQuery)
 
-    def __init__(self, tcplist, udplist, hostlists, *args, **kwargs):
+    def __init__(self, tcplist, udplist, hostlists, networks, *args, **kwargs):
         #Validar que las listas vengan con información que no esten en cero
         super().__init__(*args, **kwargs)
         self.fields['FWRulePort'].choices = tcplist + udplist
-        self.fields['FWRuleOrigin'].choices = hostlists
-        self.fields['FwRuleDst'].choices = hostlists
+        self.fields['FWRuleOrigin'].choices = hostlists + networks
+        self.fields['FwRuleDst'].choices = hostlists + networks
 
 class ChoseConsoleForm(forms.Form):
     #UsersQuery = tuple(R80Users.objects.values_list('id', 'R80User'))
