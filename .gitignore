@@ -2,3 +2,4 @@ db.sqlite3
 APIR80/__pycache__/
 chkp/__pycache__/
 APIR80/migrations/__pycache__/
+APIR80/tmp/

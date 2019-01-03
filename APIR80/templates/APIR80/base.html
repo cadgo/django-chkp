@@ -1,5 +1,4 @@
 {% load staticfiles %}
-
 <!DOCTYPE html>
 <html lang="en">
 {% block head %}
@@ -32,6 +31,8 @@
 {% include 'APIR80/footer.html' %}
 {% endblock %}
 {% block scripts %}
+    {% load static %}
+    <script src="{% static "APIR80/functionsAPI.js" %}"></script>
 {% endblock %}
 </body>
 </html>

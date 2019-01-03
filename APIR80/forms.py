@@ -31,8 +31,11 @@ class AnsibleFWDeploy(forms.Form):
 class RuleBasesForm(forms.Form):
     ActionChoice = (('Accept', 'Accept'), ('Drop', 'Drop'),)
     LogChoice = (('Log', 'Log'), ('Full Log', 'Full Log'),('Network Log', 'Network Log'), ('None', 'None'),)
-    LayerForm = forms.CharField(label='Layer to Use', max_length=20)
-    RuleName = forms.CharField(label='rule name', max_length=20, strip=True)
+    LayerForm = forms.CharField(label='Layer to Use', max_length=20,
+                                widget=forms.TextInput(attrs={'class': 'form-control'}))
+    RuleName = forms.CharField(label='Rule Name',max_length=20, strip=True,
+                               widget = forms.TextInput(attrs={'class': 'form-control',
+                                                               'placeholder': 'RuleName'}))
     FWRuleOrigin = forms.ChoiceField(label='Src IP')
     FwRuleDst = forms.ChoiceField(label='Dst IP')
     #FWRulePort = forms.IntegerField(min_value=1, max_value=65525)
@@ -55,4 +58,22 @@ class ChoseConsoleForm(forms.Form):
     MgmtQuery = tuple(MGMTServer.objects.values_list('id', 'ServerIP'))
     MgmtFormChoice = forms.ChoiceField(label='SMSServer', choices=MgmtQuery)
 
+class R80CreateHost(forms.Form):
+    name = forms.CharField(label='Host Name', max_length=20)
+    IPv4Address = forms.GenericIPAddressField(label='IP Address', protocol="IPv4")
 
+    #Agregar init para que R80CreateHostNatHide, pueda ser validada, ya que necesitamos tomar de kwarfs name e IPv4Address
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+
+class R80CreateHostNatHide(R80CreateHost):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        #self.fields['Nat'] = forms.CharField(label='Nat Hide', initial='hide', widget=forms.HiddenInput())
+        self.fields['SrcNat'] = forms.ChoiceField(label='Hide Nat', choices=(('behind GW', 'behind GW'),('IP Address', 'IP Address'),))
+        self.fields['SrcIP'] = forms.CharField(label='Src NAT IP', initial='gateway')
+
+class R80CreateHostNatStatic(R80CreateHost):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['NatIP'] = forms.GenericIPAddressField(label='Nated IP', protocol="IPv4")

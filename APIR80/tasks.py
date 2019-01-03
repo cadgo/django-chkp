@@ -292,6 +292,41 @@ class CheckPointAPI():
         response= json.loads(conn.read().decode())
         return response
 
+    def ChkpCreateHost(self, name, ipv4address, natmethod='no', natparameters='gateway'):
+        PathAppend = "/web_api/add-host"
+        data = {
+             'name': name,
+             'ip-address': ipv4address
+        }
+        print("Natmethod {}".format(natmethod))
+        if natmethod == 'hide':
+            if natparameters == 'gateway':
+                data.update({'nat-settings': {'auto-rule': True,
+                                          'method': 'hide',
+                                          'hide-behind': natparameters}})
+            else:
+                data.update({'nat-settings': {'auto-rule': True,
+                                          'method': 'hide', 'ipv4-address': natparameters,
+                                          'hide-behind': 'ip-address'}})
+        elif natmethod =='static':
+            data.update({'nat-settings': {'auto-rule': True,
+                                         'ipv4-address': natparameters, 'method': 'static'}})
+        # {'no': lambda: data,
+        #     'hide': lambda: data.update({'nat-settings': {'auto-rule': True,
+        #                                       'ipv4-address': ipv4address, 'method': 'hide',
+        #                                       'hide-behind': hidebehind}}),
+        #     'static': lambda: data.update({'auto-rule': True,
+        #                                         'ipv4-address': ipv4address, 'method': 'static'})
+        # }.get(natmethod, lambda: None)
+        jdata = json.JSONEncoder().encode(data)
+        print(jdata)
+        self.__ChkpValidateSID()
+        self.__ChkpValidConnection(PathAppend, jdata)
+        conn = self.connection.getresponse()
+        self.__ChkpCheckHTTPReturnCode(conn)
+        response = json.loads(conn.read().decode())
+        return response
+
 class CheckPointEConnection(CheckPointAPI):
     def __init__(self, user, password, IP):
         self.user = user

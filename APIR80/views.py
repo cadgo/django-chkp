@@ -7,27 +7,13 @@ from . import tasks
 from django.core.exceptions import SuspiciousOperation
 from django.shortcuts import redirect
 from pathlib import Path
+from django.views.generic.edit import FormView
 import json
 
 class LoginIndex(generic.ListView):
     model = models.R80Users
     #template_name = 'APIR80/index.html'
     template_name = 'registration/login.html'
-
-
-
-# # Create your views here.
-# def index2(request):
-#     print(request.user.is_authenticated)
-#     if request.user.is_authenticated:
-#         return render(request, 'APIR80/extend.html')
-#     return render(request, 'APIR80/index.html')
-#
-# def extends(request):
-#     if request.user.is_authenticated:
-#         return render(request, 'APIR80/extend.html')
-#     else:
-#         return render(request, 'APIR80/index.html')
 
 
 class AnsibleDemo2(LoginRequiredMixin, generic.ListView):
@@ -184,7 +170,6 @@ class RulesDemo(LoginRequiredMixin, View):
         return render(request, self.template_name, {'rulesform': self.form_class(self.GetListTCPObjects(), self.GetListUDPObjects(),
                                                                                  self.GetListHostsObjects(),
                                                                                  self.GetListNetworkObjects())})
-
     def post(self, request, *args, **kwargs):
         print(request.POST)
         form = self.form_class(data=request.POST, tcplist=self.GetListTCPObjects(), udplist=self.GetListUDPObjects(),hostlists=self.GetListHostsObjects(), networks=self.GetListNetworkObjects())
@@ -266,3 +251,84 @@ class extendsView(LoginRequiredMixin, View):
         form = self.form_class()
         print(request)
         return render(request, self.template_name, {'form': form})
+
+class CreateHostView(LoginRequiredMixin, FormView):
+    template_name = 'APIR80/createhost.html'
+    form_class= forms.R80CreateHost
+    success_url = "extends/rulesdemo/"
+    MgmtServer= None
+
+    def get(self, request):
+        MgmtServerToUse = request.GET.get('MgmtFormChoice')
+        if MgmtServerToUse == None:
+            return redirect('extends')
+        CreateHostView.MgmtServer = int(MgmtServerToUse)
+        print(CreateHostView.MgmtServer)
+        #self.MgmtServerToUse = models.MGMTServer.objects.get(pk=int(MgmtServerToUse))
+        #self.ChkpLoginInfo = models.R80Users.objects.get(UsersID=MgmtServerToUse)
+        return render(request, self.template_name, {'form': self.form_class()})
+
+    def post(self, request):
+        print(request.POST)
+        if request.POST.get('NatRadio') == 'NoNat':
+            print("No Nateamos")
+            form = self.form_class(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data['name']
+                ipv4host = form.cleaned_data['IPv4Address']
+                print("name {}, ipv4host {} post {}".format(CreateHostView.MgmtServer,
+                                                            name, ipv4host))
+                serverInfo = models.MGMTServer.objects.get(pk=CreateHostView.MgmtServer)
+                LoginInfo = models.R80Users.objects.get(UsersID=CreateHostView.MgmtServer)
+                conn = tasks.CheckPointAPI(serverInfo.ServerIP, serverInfo.MgmtPort)
+                conn.ChkpLogin(LoginInfo.R80User, LoginInfo.R80Password)
+                conn.ChkpCreateHost(name, ipv4host)
+                conn.ChkpPublish()
+                conn.LogOutCheckPoint()
+                return render(request, self.template_name, {'form': self.form_class(), 'status': 'close'})
+        if request.POST.get('NatRadio') == 'NatHide':
+            print("Generamos un Nat Hide")
+            form = forms.R80CreateHostNatHide(data=request.POST)
+            if form.is_valid():
+                name = form.cleaned_data['name']
+                ipv4host = form.cleaned_data['IPv4Address']
+                srcnat = form.cleaned_data['SrcNat']
+                print("name {}, ipv4host {} post {}".format(CreateHostView.MgmtServer,
+                                                            name, ipv4host))
+                serverInfo = models.MGMTServer.objects.get(pk=CreateHostView.MgmtServer)
+                LoginInfo = models.R80Users.objects.get(UsersID=CreateHostView.MgmtServer)
+                conn = tasks.CheckPointAPI(serverInfo.ServerIP, serverInfo.MgmtPort)
+                conn.ChkpLogin(LoginInfo.R80User, LoginInfo.R80Password)
+                if srcnat == 'behind GW':
+                    print('Nat behindGW')
+                    conn.ChkpCreateHost(name, ipv4host, 'hide')
+                    conn.ChkpPublish()
+                    conn.LogOutCheckPoint()
+                elif srcnat == 'IP Address':
+                    print('Nat IP Address')
+                    srcip = form.cleaned_data['SrcIP']
+                    conn.ChkpCreateHost(name, ipv4host, 'hide', srcip)
+                    conn.ChkpPublish()
+                    conn.LogOutCheckPoint()
+                else:
+                    conn.LogOutCheckPoint()
+                    return render(request, self.template_name, {'form': self.form_class()})
+                return render(request, self.template_name, {'form': self.form_class(), 'status': 'close'})
+        if request.POST.get('NatRadio') == 'StaticNat':
+            print("Generamos un Nat Estatico")
+            form = forms.R80CreateHostNatStatic(data=request.POST)
+            if form.is_valid():
+                name = form.cleaned_data['name']
+                ipv4host = form.cleaned_data['IPv4Address']
+                staticIP = form.cleaned_data['NatIP']
+                serverInfo = models.MGMTServer.objects.get(pk=CreateHostView.MgmtServer)
+                LoginInfo = models.R80Users.objects.get(UsersID=CreateHostView.MgmtServer)
+                conn = tasks.CheckPointAPI(serverInfo.ServerIP, serverInfo.MgmtPort)
+                conn.ChkpLogin(LoginInfo.R80User, LoginInfo.R80Password)
+                conn.ChkpCreateHost(name, ipv4host, 'static', staticIP)
+                conn.ChkpPublish()
+                conn.LogOutCheckPoint()
+                return render(request, self.template_name, {'form': self.form_class(), 'status': 'close'})
+            else:
+                return render(request, self.template_name, {'form': self.form_class()})
+

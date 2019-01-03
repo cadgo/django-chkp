@@ -3,7 +3,7 @@
     API Rule Base Demo
 {% endblock %}
 {% block content %}
-<div class="container">
+<br class="container">
     <h1>Automation Demo For R80 API</h1>
     <p class="lead">
         R80 API demo to deploy Rule bases:
@@ -16,6 +16,17 @@
             <li>UDP Objects</li>
         </ul>
     </p>
+    <div class="container">
+       <div class="row">
+           <div class="col d-flex justify-content-center">
+               <button type="button" class="btn btn-success" onclick="CreateHostFrame()">Create Host</button>
+           </div>
+           <div class="col d-flex justify-content-center">
+               <button type="button" class="btn btn-success">Create Network</button>
+           </div>
+       </div>
+    </div>
+    </br>
     <div class="card text-center">
         <div class="card-header bg-info">
             <h5>FIREWALL RULES</h5>
@@ -25,27 +36,26 @@
                 {% csrf_token %}
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
-                        <label for="{{ rulesform.LayerForm.id_for_label }}">Layer Append</label>{{ rulesform.LayerForm }}<br />
+                        <label for="{{ rulesform.LayerForm.id_for_label }}">Layer Append</label>
+                            {{ rulesform.LayerForm }}<br />
                     </li>
                     <li class="list-group-item">
-                        <label for="{{ rulesform.RuleName.id_for_label }}">Rule Name</label>
-                        {{ rulesform.RuleName }}
+                        <div class="row">
+                        <label for="{{ rulesform.RuleName.id_for_label }}"></label>
+                        <div class="col-2">
+                            {{ rulesform.RuleName }}
+                        </div>
                         <label for="{{ rulesform.FWRuleOrigin.id_for_label }}">Dst Origin</label>
                         {{ rulesform.FWRuleOrigin }}
                         <label for="{{ rulesform.FwRuleDst.id_for_label }}">Dst Dir</label>
                         {{ rulesform.FwRuleDst }}
-                     <!--   <select name="ProtocolType" id="{{ rulesform.ProtocolType.id_for_label }}">
-                            {% for id, proto in rulesform.fields.ProtocolType.choices %}
-                            <option value="{{ id }}">{{ proto }}</option>
-                            {% endfor %}
-                        </select>-->
-                        <!--<label for="{{ rulesform.FWRulePort.id_for_label }}">Port</label>-->
                         {{ rulesform.FWRulePort }}
                         {{ rulesform.ActionRule }}
                         {{ rulesform.LogRule }}
+                        </div>
                     </li>
                 </ul>
-                <input type="submit" value="SubmitRules">
+                <input type="submit" class="btn btn-primary" value="SubmitRules">
             </form>
         </div>
     </div>

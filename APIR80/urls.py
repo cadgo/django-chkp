@@ -11,6 +11,7 @@ urlpatterns = [
     path('extends/', views.extendsView.as_view(), name='extends'),
     path('extends/ansibledemo/', views.AnsibleDemo.as_view(), name='ansibledemo'),
     path('extends/rulesdemo/', views.RulesDemo.as_view(), name='rulesdemo'),
+    path('extends/createhost/', views.CreateHostView.as_view(), name='createhost'),
     path('accounts/login/', auth_views.LoginView.as_view(form_class=MyLoginForm), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout')
     #path('accounts/', include('django.contrib.auth.urls'), name='loginpage')
