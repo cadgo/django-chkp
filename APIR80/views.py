@@ -103,7 +103,7 @@ class RulesDemo(LoginRequiredMixin, View):
             data = json.load(f)
         total = data['total']
         if total == 0:
-            return rdata.append(['',''])
+            return None
         for i in range(total):
             # print(data['objects'][i]['name'])
             # print(data['objects'][i]['port'])
@@ -118,7 +118,7 @@ class RulesDemo(LoginRequiredMixin, View):
             data = json.load(f)
         total = data['total']
         if total == 0:
-            return rdata.append(['',''])
+            return None
         for i in range(total):
             # print(data['objects'][i]['name'])
             # print(data['objects'][i]['port'])
@@ -133,7 +133,7 @@ class RulesDemo(LoginRequiredMixin, View):
             data = json.load(f)
         total = data['total']
         if total == 0:
-            return rdata.append(['',''])
+            return None
         for i in range(total):
             rdata.append([data['objects'][i]['name'],data['objects'][i]['ipv4-address']])
         return rdata
@@ -148,7 +148,7 @@ class RulesDemo(LoginRequiredMixin, View):
             data = json.load(f)
         total = data['total']
         if total == 0:
-            return rdata.append(['',''])
+            return None
         print(data)
         for i in range(total):
             try:
@@ -167,9 +167,24 @@ class RulesDemo(LoginRequiredMixin, View):
         self.ServerInfo['MgmtServerUser'] = models.R80Users.objects.get(UsersID=MgmtServerToUse)
         self.ServerInfo['MgmtObjects'] = models.MGMTServerObjects.objects.get(MGMTServerObjectsID=MgmtServerToUse)
         self.__CheckFilesAndData()
-        return render(request, self.template_name, {'rulesform': self.form_class(self.GetListTCPObjects(), self.GetListUDPObjects(),
-                                                                                 self.GetListHostsObjects(),
-                                                                                 self.GetListNetworkObjects())})
+        tcpObjects = self.GetListTCPObjects()
+        udpObjects = self.GetListUDPObjects()
+        hostObjects = self.GetListHostsObjects()
+        networkObjects = self.GetListNetworkObjects()
+        if hostObjects == None and networkObjects == None:
+            print('No objects')
+            return render(request, self.template_name, {'noobjects': 'yes'})
+        if hostObjects == None:
+            render(request, self.template_name, {'rulesform': self.form_class(tcpObjects, udpObjects,
+                                                                              None, networkObjects)})
+        elif networkObjects == None:
+            render(request, self.template_name, {'rulesform': self.form_class(tcpObjects, udpObjects,
+                                                                              hostObjects, None)})
+        return render(request, self.template_name, {'rulesform': self.form_class(tcpObjects,udpObjects,
+                                                                                 hostObjects, networkObjects)})
+        #return render(request, self.template_name, {'rulesform': self.form_class(self.GetListTCPObjects(), self.GetListUDPObjects(),
+                                                                                 #self.GetListHostsObjects(),
+                                                                                 #self.GetListNetworkObjects())})
     def post(self, request, *args, **kwargs):
         print(request.POST)
         form = self.form_class(data=request.POST, tcplist=self.GetListTCPObjects(), udplist=self.GetListUDPObjects(),hostlists=self.GetListHostsObjects(), networks=self.GetListNetworkObjects())

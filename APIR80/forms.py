@@ -49,8 +49,22 @@ class RuleBasesForm(forms.Form):
         #Validar que las listas vengan con información que no esten en cero
         super().__init__(*args, **kwargs)
         self.fields['FWRulePort'].choices = tcplist + udplist
-        self.fields['FWRuleOrigin'].choices = hostlists + networks
-        self.fields['FwRuleDst'].choices = hostlists + networks
+        if hostlists == None:
+            self.fields['FWRuleOrigin'].choices = networks
+            self.fields['FwRuleDst'].choices = networks
+        elif networks == None:
+            self.fields['FWRuleOrigin'].choices = hostlists
+            self.fields['FwRuleDst'].choices = hostlists
+        else:
+            self.fields['FWRuleOrigin'].choices = hostlists + networks
+            self.fields['FwRuleDst'].choices = hostlists + networks
+
+    # def __init__(self, tcplist, udplist, hostlists, networks, *args, **kwargs):
+    #     #Validar que las listas vengan con información que no esten en cero
+    #     super().__init__(*args, **kwargs)
+    #     self.fields['FWRulePort'].choices = tcplist + udplist
+    #     self.fields['FWRuleOrigin'].choices = hostlists + networks
+    #     self.fields['FwRuleDst'].choices = hostlists + networks
 
 class ChoseConsoleForm(forms.Form):
     #UsersQuery = tuple(R80Users.objects.values_list('id', 'R80User'))
