@@ -272,6 +272,8 @@ class CreateHostView(LoginRequiredMixin, FormView):
     form_class= forms.R80CreateHost
     success_url = "extends/rulesdemo/"
     MgmtServer= None
+    dummyhideNatJS = forms.DummyJSR80CreateNatHide
+    dummystaticNatJS = forms.DummyJSR80CreateHostNatStatic
 
     def get(self, request):
         MgmtServerToUse = request.GET.get('MgmtFormChoice')
@@ -281,7 +283,10 @@ class CreateHostView(LoginRequiredMixin, FormView):
         print(CreateHostView.MgmtServer)
         #self.MgmtServerToUse = models.MGMTServer.objects.get(pk=int(MgmtServerToUse))
         #self.ChkpLoginInfo = models.R80Users.objects.get(UsersID=MgmtServerToUse)
-        return render(request, self.template_name, {'form': self.form_class()})
+        return render(request, self.template_name, {'form': self.form_class(),
+                                                    'dummyhide': self.dummyhideNatJS(),
+                                                    'dummyStatic': self.dummystaticNatJS(),
+                                                    'posturl': 'createhost'})
 
     def post(self, request):
         print(request.POST)
@@ -344,6 +349,99 @@ class CreateHostView(LoginRequiredMixin, FormView):
                 conn.ChkpPublish()
                 conn.LogOutCheckPoint()
                 return render(request, self.template_name, {'form': self.form_class(), 'status': 'close'})
-            else:
-                return render(request, self.template_name, {'form': self.form_class()})
+        return render(request, self.template_name, {'form': self.form_class(),
+                                                            'dummyhide': self.dummyhideNatJS(),
+                                                            'dummyStatic': self.dummystaticNatJS(),
+                                                            'posturl': 'createhost'})
 
+class CreateNetworkView(LoginRequiredMixin, FormView):
+    template_name = 'APIR80/createhost.html'
+    form_class = forms.R80CreateNet
+    success_url = "extends/rulesdemo/"
+    dummyhideNatJS = forms.DummyJSR80CreateNetHide
+    dummystaticNatJS = forms.DummyJSR80CreateNetNatStatic
+    MgmtServer = None
+
+    def get(self, request):
+        MgmtServerToUse = request.GET.get('MgmtFormChoice')
+        if MgmtServerToUse == None:
+            return redirect('extends')
+        CreateHostView.MgmtServer = int(MgmtServerToUse)
+        print(CreateHostView.MgmtServer)
+        return render(request, self.template_name, {'form': self.form_class(),
+                                                    'dummyhide': self.dummyhideNatJS(),
+                                                    'dummyStatic': self.dummystaticNatJS(),
+                                                    'posturl': 'createnetwork'})
+
+    def post(self, request):
+        print(request.POST)
+        if request.POST.get('NatRadio') == 'NoNat':
+            print("No Nateamos")
+            form = self.form_class(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data['name']
+                #ipv4host = form.cleaned_data['IPv4NetAddress']
+                ipv4NetAddress = form.cleaned_data['IPv4NetAddress']
+                subnet = form.cleaned_data['subnet']
+                print("name {}, ipv4NetAddress {} mask {}".format(CreateHostView.MgmtServer,
+                                                            name, ipv4NetAddress, subnet))
+                serverInfo = models.MGMTServer.objects.get(pk=CreateHostView.MgmtServer)
+                LoginInfo = models.R80Users.objects.get(UsersID=CreateHostView.MgmtServer)
+                conn = tasks.CheckPointAPI(serverInfo.ServerIP, serverInfo.MgmtPort)
+                conn.ChkpLogin(LoginInfo.R80User, LoginInfo.R80Password)
+                conn.ChkpCreateNetwork(name, ipv4NetAddress, subnet)
+                conn.ChkpPublish()
+                conn.LogOutCheckPoint()
+                return render(request, self.template_name, {'form': self.form_class(), 'status': 'close'})
+        if request.POST.get('NatRadio') == 'NatHide':
+            print("Generamos un Nat Hide")
+            form = forms.R80CreateNetNatHide(data=request.POST)
+            print(form.is_valid())
+            if form.is_valid():
+                name = form.cleaned_data['name']
+                #ipv4host = form.cleaned_data['IPv4Address']
+                ipv4NetAddress = form.cleaned_data['IPv4NetAddress']
+                subnet = form.cleaned_data['subnet']
+                srcnat = form.cleaned_data['SrcNat']
+                print("name {}, ipv4NetAddress {} post {}".format(CreateHostView.MgmtServer,
+                                                                name, ipv4NetAddress))
+                serverInfo = models.MGMTServer.objects.get(pk=CreateHostView.MgmtServer)
+                LoginInfo = models.R80Users.objects.get(UsersID=CreateHostView.MgmtServer)
+                conn = tasks.CheckPointAPI(serverInfo.ServerIP, serverInfo.MgmtPort)
+                conn.ChkpLogin(LoginInfo.R80User, LoginInfo.R80Password)
+                if srcnat == 'behind GW':
+                    print('Nat behindGW')
+                    conn.ChkpCreateNetwork(name, ipv4NetAddress, subnet, 'hide')
+                    conn.ChkpPublish()
+                    conn.LogOutCheckPoint()
+                elif srcnat == 'IP Address':
+                    print('Nat IP Address')
+                    srcip = form.cleaned_data['SrcIP']
+                    conn.ChkpCreateNetwork(name, ipv4NetAddress, subnet, 'hide', srcip)
+                    conn.ChkpPublish()
+                    conn.LogOutCheckPoint()
+                else:
+                    conn.LogOutCheckPoint()
+                    return render(request, self.template_name, {'form': self.form_class()})
+                return render(request, self.template_name, {'form': self.form_class(), 'status': 'close'})
+        if request.POST.get('NatRadio') == 'StaticNat':
+            print("Generamos un Nat Estatico")
+            form = forms.R80CreateNetNatStatic(data=request.POST)
+            if form.is_valid():
+                name = form.cleaned_data['name']
+                #ipv4host = form.cleaned_data['IPv4Address']
+                ipv4NetAddress = form.cleaned_data['IPv4NetAddress']
+                staticIP = form.cleaned_data['NatIP']
+                subnet = form.cleaned_data['subnet']
+                serverInfo = models.MGMTServer.objects.get(pk=CreateHostView.MgmtServer)
+                LoginInfo = models.R80Users.objects.get(UsersID=CreateHostView.MgmtServer)
+                conn = tasks.CheckPointAPI(serverInfo.ServerIP, serverInfo.MgmtPort)
+                conn.ChkpLogin(LoginInfo.R80User, LoginInfo.R80Password)
+                conn.ChkpCreateNetwork(name, ipv4NetAddress, subnet,'static', staticIP)
+                conn.ChkpPublish()
+                conn.LogOutCheckPoint()
+                return render(request, self.template_name, {'form': self.form_class(), 'status': 'close'})
+        return render(request, self.template_name, {'form': self.form_class(),
+                                                    'dummyhide': self.dummyhideNatJS(),
+                                                    'dummyStatic': self.dummystaticNatJS(),
+                                                    'posturl': 'createnetwork'})

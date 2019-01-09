@@ -91,3 +91,35 @@ class R80CreateHostNatStatic(R80CreateHost):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['NatIP'] = forms.GenericIPAddressField(label='Nated IP', protocol="IPv4")
+
+class DummyJSR80CreateNatHide(forms.Form):
+    SrcNat = forms.ChoiceField(label='Hide Nat', choices=(('behind GW', 'behind GW'),('IP Address', 'IP Address')))
+    SrcIP = forms.CharField(label='Src NAT IP', initial='gateway')
+
+class DummyJSR80CreateHostNatStatic(forms.Form):
+    NatIP = forms.GenericIPAddressField(label='Nated IP', protocol="IPv4")
+
+class R80CreateNet(forms.Form):
+    name = forms.CharField(label='Net Name', max_length=20)
+    IPv4NetAddress = forms.GenericIPAddressField(label='IP Address', protocol="IPv4")
+    subnet = forms.IntegerField(label='subnet', initial=24 ,min_value=1, max_value=32)
+
+class R80CreateNetNatHide(R80CreateNet):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        #self.fields['Nat'] = forms.CharField(label='Nat Hide', initial='hide', widget=forms.HiddenInput())
+        self.fields['SrcNat'] = forms.ChoiceField(label='Hide Nat', choices=(('behind GW', 'behind GW'),('IP Address', 'IP Address'),))
+        self.fields['SrcIP'] = forms.CharField(label='Src NAT IP', initial='gateway')
+
+class DummyJSR80CreateNetHide(forms.Form):
+    SrcNat = forms.ChoiceField(label='Hide Nat', choices=(('behind GW', 'behind GW'),('IP Address', 'IP Address')))
+    SrcIP = forms.CharField(label='Src NAT IP', initial='gateway')
+
+
+class R80CreateNetNatStatic(R80CreateNet):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['NatIP'] = forms.GenericIPAddressField(label='Nated IP', protocol="IPv4")
+
+class DummyJSR80CreateNetNatStatic(forms.Form):
+    NatIP = forms.GenericIPAddressField(label='Nated IP', protocol="IPv4")
