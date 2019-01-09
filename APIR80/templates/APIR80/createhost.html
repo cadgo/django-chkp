@@ -1,0 +1,41 @@
+{% extends 'APIR80/base.html' %}
+{% block title %}
+    API R80 Create Host
+{% endblock %}
+{% block navbar %}
+{% endblock %}
+{% block content %}
+{% if status %}
+<div class="allert alert-warning">
+    <stong><p>Object Created closing window...</p></stong>
+</div>
+{% endif %}
+{% if posturl == "createhost" %}
+<form action="{% url 'createhost' %}" method="post">
+{% endif %}
+{% if posturl == "createnetwork" %}
+<form action="{% url 'createnetwork' %}" method="post">
+{% endif %}
+    {% csrf_token %}
+    {{ form.as_p }}
+  <input type="radio" name="NatRadio" value="NoNat" id="NoNat" checked> No Nat
+  <input type="radio" name="NatRadio" value="NatHide" id="NatHideID"> Nat Hide
+  <input type="radio" name="NatRadio" value="StaticNat" id="StaticNatID"> Static Nat
+    <div id="LastElement">
+
+    </div>
+    <input type="submit" class="btn btn-primary" value="SubmitHost">
+</form>
+{% endblock %}
+{% block footer %}
+{% endblock %}
+{% block scripts %}
+    {% load static %}
+    <script src="{% static "APIR80/functionsAPI.js" %}"></script>
+    {% include "APIR80/createhostandnetwork.js" %}
+    {% if status %}
+    <script>
+        DeleteHostFrame()
+    </script>
+{% endif %}
+{% endblock %}
