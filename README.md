@@ -55,7 +55,7 @@ First steps using the web interface.
 1.- Create an API user in our Smart Center Server
 2.- Enable the API for all IPs
 
-We need to add the smart center server inside our database using this URL http://<IP Address>:8000/admin/
+We need to add the smart center server inside our database using this URL http://IPADDRESS:8000/admin/
   
   By default the dockerfile create an user admin/zubur1
 
@@ -104,7 +104,7 @@ Stop the web server inside our docker  just pressing cntr+c inside here
 
 And run it again!
 
-We are ready to use our web interface, we can follow the next link http://<ip address>:8000/r80api/extends
+We are ready to use our web interface, we can follow the next link http://IPADDRESS:8000/r80api/extends
   
 The new Server appears in the extends pages if the servers redirect to the login page, just login with the user created in step number 1.
 
