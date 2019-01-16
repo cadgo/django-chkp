@@ -32,3 +32,20 @@ This app is designet to run using docker, the first step to deploy it is using D
 git clone https://github.com/cadgo/django-chkp.git
 
 3.- Use the Dockerfile inside the created folder 
+
+sudo docker build -t chkpdjango .
+
+This will generate a Docker image 
+
+sudo docker image ls -a
+
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+chkpdjango          latest              198d302b7fdc        5 minutes ago       994MB
+python              3                   7c5fd2af3815        6 days ago          927MB
+
+We can run the container in this way
+sudo docker run -it --network=host chkpdjango /bin/bash
+
+to Run the server we need to execute
+
+python3 manage.py runserver 0.0.0.0:8000
