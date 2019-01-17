@@ -115,14 +115,21 @@ The ansible section maybe comes later
 After choose the Smart Center Server you can create a rulebase
 
 LayerAppend: It's create a new Layer.
+
 Rule Name: Rule Name
+
 Dst Origin: hosts and networks inside the Console
+
 Dst Dir: hosts and networks inside the Console
+
 Ports: TCP and UDP Ports
+
 Action: Accept
+
 Log: :)
 
 ![screenshot](https://github.com/cadgo/django-chkp/blob/assets/RuleBase.png)
+
 
 it will create a new Layer like
 
