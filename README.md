@@ -72,12 +72,19 @@ We need to add the smart center server inside our database using this URL http:/
 We need to add the form
 
 MgmtR80Name: A name for our MGMT Server in our web interface
+
 ServerIP: IP address
+
 Description: a brief description 
+
 MgmtR80VersionsSupported: leave as default, there are future plans
+
 MGMTR80IsAlive: leave as default
+
 MgmtFingerPrintAPI: leave as default
+
 MgmtPort: Port used by the API 
+
 LastPublishSession: Leave as default this a version control for the database between the SMS and the DB
 
 4.- Create a Mgmt server Objectss
@@ -95,7 +102,9 @@ And just save by default, this is going to create a path to save the DB in a txt
 ![Screenshot](https://github.com/cadgo/django-chkp/blob/assets/MgmtServerUsers.PNG)
 
 UsersID: Select the previous added Mgmt Server
+
 R80User: the username for example api_user
+
 R80password: The username password
 
 Stop the web server inside our docker  just pressing cntr+c inside here
