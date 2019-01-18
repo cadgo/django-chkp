@@ -39,9 +39,7 @@ This will generate a Docker image
 
 sudo docker image ls -a
 
-REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-chkpdjango          latest              198d302b7fdc        5 minutes ago       994MB
-python              3                   7c5fd2af3815        6 days ago          927MB
+![screenshot](https://github.com/cadgo/django-chkp/blob/assets/dockerimage.PNG)
 
 We can run the container in this way
 sudo docker run -it --network=host chkpdjango /bin/bash
