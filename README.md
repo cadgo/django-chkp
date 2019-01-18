@@ -22,6 +22,7 @@ This Web interface can create:
 The app is divide in several files following the django development model
 
 Vies.py - The backend and the way how the web server analyze the get and post requests, we call the Check Point API from this side.
+
 Tasks.py - The R80 API is represented in this file.
 
 # How to Start
@@ -36,6 +37,8 @@ git clone https://github.com/cadgo/django-chkp.git
 3.- Use the Dockerfile inside the created folder 
 
 sudo docker build -t chkpdjango .
+
+Don't forget the dot at the end of the command
 
 This will generate a Docker image 
 
