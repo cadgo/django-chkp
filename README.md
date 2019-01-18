@@ -14,7 +14,9 @@ What can I do
 This Web interface can create:
 
 1.- Layers and rules
+
 2.- Create host objects with Nat Hide, Static Nat
+
 3.- Create Networks objects with Nat Hide, Static Nat.
 
 The app is divide in several files following the django development model
