@@ -26,24 +26,6 @@ class MGMTServerObjects(models.Model):
     MGMTServerFilePathNetObjects = models.CharField(max_length=250,default='{}/APIR80/tmp/chkpobjects.txt'.format(settings.BASE_DIR))
     MGMTServerFilePathNetworksObjects = models.CharField(max_length=250, default='{}/APIR80/tmp/chkpobjectsnetworks.txt'.format(settings.BASE_DIR))
 
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     self.filelist = [self.MGMTServerFilePathTCPPorts, self.MGMTServerFilePathNetObjects]
-    #     self.index = -1
-    #
-    # def __iter__(self):
-    #     return self.filelist[self.index]
-    #
-    # def __next__(self):
-    #     self.index +=1
-    #     if self.index == len(self.filelist):
-    #         self.index = 0
-    #         raise StopIteration
-    #
-    #     return self.filelist[self.index]
-
-
-
 # class MGMTServerObjectsNetworks(models.Model):
 #     MGMTServerObjectsNetworksID = models.ForeignKey(MGMTServer, on_delete=models.CASCADE)
 #     MGMTServerFilePathNetObjects = models.CharField(max_length=250, default='{}/APIR80/tmp/chkpobjects.txt'.format(settings.BASE_DIR))

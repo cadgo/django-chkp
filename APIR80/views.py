@@ -4,6 +4,7 @@ from django.views import generic, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from . import models, forms
 from . import tasks
+from .models import R80Users, MGMTServer
 from django.core.exceptions import SuspiciousOperation
 from django.shortcuts import redirect
 from pathlib import Path
@@ -263,7 +264,8 @@ class extendsView(LoginRequiredMixin, View):
     redirect_field_name = 'redirect_to'
 
     def get(self, request, *args, **kwargs):
-        form = self.form_class()
+        MgmtQuery = tuple(MGMTServer.objects.values_list('id', 'ServerIP'))
+        form = self.form_class(MgmtQuery)
         print(request)
         return render(request, self.template_name, {'form': form})
 

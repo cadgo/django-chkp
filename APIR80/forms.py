@@ -67,10 +67,12 @@ class RuleBasesForm(forms.Form):
     #     self.fields['FwRuleDst'].choices = hostlists + networks
 
 class ChoseConsoleForm(forms.Form):
-    #UsersQuery = tuple(R80Users.objects.values_list('id', 'R80User'))
     #MgmtQuery = tuple(MGMTServer.objects.values_list('id', 'ServerIP'))
-    MgmtQuery = tuple(MGMTServer.objects.values_list('id', 'ServerIP'))
-    MgmtFormChoice = forms.ChoiceField(label='SMSServer', choices=MgmtQuery)
+    MgmtFormChoice = forms.ChoiceField(label='SMSServer')
+
+    def __init__(self, servers, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['MgmtFormChoice'].choices = servers
 
 class R80CreateHost(forms.Form):
     name = forms.CharField(label='Host Name', max_length=20)
