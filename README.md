@@ -32,7 +32,12 @@ This app is designet to run using docker, the first step to deploy it is using D
 1.- Install Docker following the instructions for your Linux Distro
 2.- Download this repository using GIT.
 
+for development version
 git clone https://github.com/cadgo/django-chkp.git
+
+or use the relased tested (recomended)
+https://github.com/cadgo/django-chkp/archive/1.zip
+https://github.com/cadgo/django-chkp/archive/1.tar.gz
 
 3.- Use the Dockerfile inside the created folder 
 
