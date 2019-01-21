@@ -1,3 +1,6 @@
 Reviszar que se este almacenando un hash para la consola de chkp
 
 https://stackoverflow.com/questions/17523263/how-to-create-password-field-in-model-django
+
+Arreglar el problema de la bd de datos dentro del form.py HECHO
+configurar el Docker file para usar docker-compose
