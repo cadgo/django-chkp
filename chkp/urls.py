@@ -18,8 +18,10 @@ from django.urls import path
 from django.contrib import admin
 from django.urls import include, path
 import django.contrib.auth.urls
+from django.views.generic import TemplateView
 
 urlpatterns = [
+    path('', TemplateView.as_view(template_name='index.html')),
     path('admin/', admin.site.urls),
     path('r80api/', include('APIR80.urls')),
 ]

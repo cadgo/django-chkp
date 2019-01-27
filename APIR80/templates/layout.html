@@ -1,0 +1,79 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+{% block head %}
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %} Dominio | Titulo de la pagina{% endblock %}</title>
+    <meta name="description" content="{% block description %}{% endblock %}"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+          integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+            integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+            crossorigin="anonymous"></script>
+</head>
+{% endblock %}
+{% block navbar %}
+<body style="">
+<div class="container-fluid">
+    {% block navbarOperative %}
+    <nav class="navbar navbar-light navbar-expand-md bg-faded justify-content-center">
+        <a href="http://web2py.com" class="navbar-brand d-flex w-50 mr-auto">CHKP Web API Demo</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse w-100" id="navbarNavDropdown">
+            <ul class="navbar-nav w-100 justify-content-center">
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false">1</a>
+                    <div class="dropdown-menu">
+
+                        <a class="dropdown-item" href="#">1</a>
+                    </div>
+                </li>
+
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="text" placeholder="Search">
+            </form>
+            <ul class="nav navbar-nav ml-auto w-100 justify-content-end">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false">
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    {% endblock %}
+</div>
+{% endblock %}
+<div class="container">
+    {% block content %}
+    {% endblock %}
+    <!--Falta agregar footer.html -->
+</div>
+{% block footer %}
+{% include 'APIR80/footer.html' %}
+{% endblock %}
+{% block scripts %}
+{% load static %}
+<script src="{% static " APIR80
+/functionsAPI.js" %}"></script>
+{% endblock %}
+</body>
+</html>
