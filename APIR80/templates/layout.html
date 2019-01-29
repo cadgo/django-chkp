@@ -25,38 +25,31 @@
 <body style="">
 <div class="container-fluid">
     {% block navbarOperative %}
-    <nav class="navbar navbar-light navbar-expand-md bg-faded justify-content-center">
-        <a href="http://web2py.com" class="navbar-brand d-flex w-50 mr-auto">CHKP Web API Demo</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
-                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <nav class="navbar navbar-expand-md fixed-top navbar-dark info-color">
+        <a class="navbar-brand" href="#">CHKP Web API MGMT</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="navbar-collapse collapse w-100" id="navbarNavDropdown">
-            <ul class="navbar-nav w-100 justify-content-center">
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true"
-                       aria-expanded="false">1</a>
-                    <div class="dropdown-menu">
-
-                        <a class="dropdown-item" href="#">1</a>
-                    </div>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link waves-effect waves-light" href="#">R80API <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link waves-effect waves-light" href="#">Admin</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link waves-effect waves-light"
+                       href="https://sc1.checkpoint.com/documents/latest/APIs/index.html">API Guide</a>
                 </li>
 
             </ul>
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="text" placeholder="Search">
+            <form class="form-inline">
+                <div class="md-form my-0">
+                    <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+                </div>
             </form>
-            <ul class="nav navbar-nav ml-auto w-100 justify-content-end">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true"
-                       aria-expanded="false">
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right">
-
-                    </div>
-                </li>
-            </ul>
         </div>
     </nav>
     {% endblock %}
