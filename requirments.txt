@@ -4,3 +4,4 @@ django-compat==1.0.15
 httplib2==0.12.0
 pytz==2018.9
 six==1.12.0
+requests>=2.21.0
