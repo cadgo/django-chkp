@@ -8,7 +8,7 @@
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <v class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
                     <a class="nav-link waves-effect waves-light" href="../r80api">R80API <span
@@ -22,11 +22,27 @@
                        href="https://sc1.checkpoint.com/documents/latest/APIs/index.html">API Guide</a>
                 </li>
             </ul>
-            <form class="form-inline">
-                <div class="md-form my-0">
-                    <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-                </div>
-            </form>
-        </div>
+            <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <form class="form-inline">
+                            <div class="md-form my-0">
+                                <input class="form-control mr-sm-2" type="text" placeholder="Search"
+                                       aria-label="Search">
+                            </div>
+                        </form>
+                    </li>
+                    <li class="nav-item">
+                        <div class="collapse navbar-collapse ">
+                            <a href="{% url 'settings' %}">
+                                <i class="fa fa-cog">
+                                </i>
+                            </a>
+
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
     </nav>
 </header>
