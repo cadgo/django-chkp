@@ -1,0 +1,99 @@
+{% extends 'layout.html' %}
+{% block title %}
+Starting Page
+{% endblock %}
+{% block content %}
+
+
+<!---Management Server login --->
+<div class="row">
+    <div class="col-xl-2 col-sm-4 mb-1">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+
+                <div class="input-group mb3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-user"></i> </span>
+                    </div>
+                    <input type="text" class="form-control" id="username" placeholder="Username" aria-label="Username"
+                           aria-describedby="basic-addon1">
+                </div>
+
+
+                <div class="input-group mb3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-lock"></i> </span>
+                    </div>
+                    <input type="password" class="form-control" id="pwd" placeholder="Password" aria-label="Password"
+                           aria-describedby="basic-addon1">
+                </div>
+                <div class="input-group mb3">
+
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-server"></i> </span>
+                    </div>
+                    <input type="text" class="form-control" id="mgmt_ip" name="mgmt_ip" data-inputmask="'alias': 'ip'">
+                </div>
+                <button class="btn btn-primary btn-icon-split" id="mgmt_login_butt" type="submit"
+                        onclick="do_login_mgmt()">
+                    <span class="icon text-white-50">
+                      <i class="fas fa-plug" id="button-icon"></i>
+                    </span>
+                    <span class="text">Connect</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-5">
+        <div id="mgt_conn"></div>
+    </div>
+</div>
+<div class="row">
+
+</div>
+
+<script>
+    function draw_mgmt_REST() {
+
+        var svg = d3.select('#mgt_conn');
+        svg.append('svg:image')
+            .attr("xlink:href", "../static/images/mgmt_icon.jpg")
+            .attr('x', -9)
+            .attr('y', -12)
+            .attr('width', 20)
+            .attr('height', 24);
+    }
+
+    function do_login_mgmt() {
+        d3.select('#button-icon').classed("fa fa-spinner fa-spin", true);
+        d3.select('#mgmt_login_butt').classed('disabled', true);
+
+        var mgmt_ip = document.getElementById('mgmt_ip').value;
+        var username = document.getElementById('username').value;
+        var pwd = document.getElementById('pwd').value;
+
+        var DTO = {'mgmt_ip': mgmt_ip, 'username': username, 'pwd': pwd};
+
+        if
+
+        $.ajax({
+            type: "POST",
+            url: "/folder/",
+            data: JSON.stringify(DTO),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+
+            success: function (result) {
+                $('.folders ul li:first-child').after('<li class="bg-color-2 ui-droppable" data-folderid="2">' + name + ' <span>0</span></li>');
+                $('.addFolder input').val('');
+            }
+        });
+
+
+    }
+
+    // Initialize InputMask
+    $(":input").inputmask();
+</script>
+
+{% endblock %}
