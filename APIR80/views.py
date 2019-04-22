@@ -31,7 +31,8 @@ class AnsibleDemo2(LoginRequiredMixin, generic.ListView):
 class RulesDemo(LoginRequiredMixin, View):
     template_name = 'APIR80/rulesdemo.html'
     login_url = '../../r80api/accounts/login/'
-    form_class = forms.RuleBasesForm
+    form_class = forms.MultiRulesForm
+    form_layer = forms.RuleLayer
     redirect_field_name = 'redirect_to'
     RulesDemoForms = {}
     ServerInfo = {'MgmtServerData': None, 'MgmtServerUser': None,
@@ -176,6 +177,106 @@ class RulesDemo(LoginRequiredMixin, View):
             print('No objects')
             return render(request, self.template_name, {'noobjects': 'yes'})
         if hostObjects == None:
+            return render(request, self.template_name,
+                          {'rulesform': self.form_class(form_kwargs={'tcplist': tcpObjects, 'udplist': udpObjects,
+                                                                     'hostlists': None,
+                                                                     'networks': networkObjects}),'layer': self.form_layer()})
+        elif networkObjects == None:
+            return render(request, self.template_name,
+                          {'rulesform': self.form_class(form_kwargs={'tcplist': tcpObjects, 'udplist': udpObjects,
+                                                                     'hostlists': hostObjects,
+                                                                     'networks': None}),'layer': self.form_layer()})
+        return render(request, self.template_name, {'rulesform': self.form_class(form_kwargs={'tcplist': tcpObjects,'udplist':udpObjects,
+                                                                                 'hostlists': hostObjects, 'networks': networkObjects}),
+                                                                                    'layer': self.form_layer()})
+
+    def post(self, request, *args, **kwargs):
+        """
+        Falta agregar el formset factory para ser procesado por nuestro post
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        layerform = self.form_layer(data=request.POST)
+        form = self.form_class(data=request.POST, form_kwargs={'tcplist':self.GetListTCPObjects(),
+                                                               'udplist':self.GetListUDPObjects(),
+                                                               'hostlists':self.GetListHostsObjects(),
+                                                               'networks':self.GetListNetworkObjects()})
+        if form.is_valid() and layerform.is_valid():
+            print("****************************Es valida******************************")
+            print(request.POST)
+            ### PONER LAS VALIDACIONES DEL FORMULARIO CON LA METADATA
+            TotalForms = int(request.POST.get("form-TOTAL_FORMS"))
+            MinNumForms = int(request.POST.get("form-MIN_NUM_FORMS"))
+            MaxNumForms = int(request.POST.get("form-MAX_NUM_FORMS"))
+            if TotalForms < MinNumForms:
+                SuspiciousOperation("Invalid request: not able to process the form")
+            if TotalForms > MaxNumForms:
+                SuspiciousOperation("Invalid request: not able to process the form")
+            layer = layerform.cleaned_data["LayerForm"]
+            conn = tasks.CheckPointAPI(self.ServerInfo['MgmtServerData'].ServerIP,
+                                        self.ServerInfo['MgmtServerData'].MgmtPort)
+            conn.ChkpLogin(self.ServerInfo['MgmtServerUser'].R80User, self.ServerInfo['MgmtServerUser'].R80Password)
+            conn.ChkpAddAccessLayer(layer)
+            conn.ChkpSetLayerDefaultRuleToAccept('Cleanup rule', layer)
+            cdata=form.cleaned_data
+            cdata.reverse()
+            print(cdata)
+            for rules in cdata:
+                conn.ChkpAddAccesRule(layer,
+                                      rules['RuleName'],
+                                      rules['FWRuleOrigin'],
+                                      rules['FwRuleDst'],
+                                      rules['FWRulePort'],
+                                      rules['ActionRule'],
+                                      rules['LogRule'])
+            conn.ChkpPublish()
+            conn.LogOutCheckPoint()
+            # for x in form.cleaned_data:
+            #     print(x)
+            #
+
+            # conn = tasks.CheckPointAPI(self.ServerInfo['MgmtServerData'].ServerIP,
+            #                            self.ServerInfo['MgmtServerData'].MgmtPort)
+            # conn.ChkpLogin(self.ServerInfo['MgmtServerUser'].R80User, self.ServerInfo['MgmtServerUser'].R80Password)
+            # conn.ChkpAddAccessLayer(request.POST.get('LayerForm'))
+            # conn.ChkpSetLayerDefaultRuleToAccept('Cleanup rule', request.POST.get('LayerForm'))
+            # conn.ChkpAddAccesRule(request.POST.get('LayerForm'),
+            #                       request.POST.get('RuleName'),
+            #                       request.POST.get('FWRuleOrigin'),
+            #                       request.POST.get('FwRuleDst'),
+            #                       request.POST.get('FWRulePort'),
+            #                       request.POST.get('ActionRule'),
+            #                       request.POST.get('LogRule'))
+            # conn.ChkpPublish()
+            # conn.LogOutCheckPoint()
+        else:
+            print("No es valida")
+            SuspiciousOperation("Invalid request: not able to process the form")
+        return render(request, self.template_name, {'rulesform': self.form_class(form_kwargs={'tcplist':self.GetListTCPObjects(),
+                                                                                              'udplist':self.GetListUDPObjects(),
+                                                                                              'hostlists':self.GetListHostsObjects(),
+                                                                                              'networks':self.GetListNetworkObjects()}),
+                                                                                                'layer': self.form_layer()})
+
+    def get1(self, request, *args, **kwargs):
+        MgmtServerToUse = request.GET.get('MgmtFormChoice')
+        if MgmtServerToUse == None:
+            return redirect('extends')
+        MgmtServerToUse = int(MgmtServerToUse)
+        self.ServerInfo['MgmtServerData'] = models.MGMTServer.objects.get(pk=MgmtServerToUse)
+        self.ServerInfo['MgmtServerUser'] = models.R80Users.objects.get(UsersID=MgmtServerToUse)
+        self.ServerInfo['MgmtObjects'] = models.MGMTServerObjects.objects.get(MGMTServerObjectsID=MgmtServerToUse)
+        self.__CheckFilesAndData()
+        tcpObjects = self.GetListTCPObjects()
+        udpObjects = self.GetListUDPObjects()
+        hostObjects = self.GetListHostsObjects()
+        networkObjects = self.GetListNetworkObjects()
+        if hostObjects == None and networkObjects == None:
+            print('No objects')
+            return render(request, self.template_name, {'noobjects': 'yes'})
+        if hostObjects == None:
             render(request, self.template_name, {'rulesform': self.form_class(tcpObjects, udpObjects,
                                                                               None, networkObjects)})
         elif networkObjects == None:
@@ -186,7 +287,7 @@ class RulesDemo(LoginRequiredMixin, View):
         #return render(request, self.template_name, {'rulesform': self.form_class(self.GetListTCPObjects(), self.GetListUDPObjects(),
                                                                                  #self.GetListHostsObjects(),
                                                                                  #self.GetListNetworkObjects())})
-    def post(self, request, *args, **kwargs):
+    def post1(self, request, *args, **kwargs):
         print(request.POST)
         form = self.form_class(data=request.POST, tcplist=self.GetListTCPObjects(), udplist=self.GetListUDPObjects(),hostlists=self.GetListHostsObjects(), networks=self.GetListNetworkObjects())
         if form.is_valid():

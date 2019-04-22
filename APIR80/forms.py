@@ -1,6 +1,7 @@
 from .models import R80Users, MGMTServer
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
+from django.forms import formset_factory
 
 class MyLoginForm(AuthenticationForm):
     username = forms.CharField(max_length=254, widget=forms.TextInput(attrs={'class': 'form-control',
@@ -28,11 +29,15 @@ class AnsibleFWDeploy(forms.Form):
     FwDeployFormHidden = forms.CharField(widget=forms.HiddenInput, initial='True')
 
 
+class RuleLayer(forms.Form):
+    LayerForm = forms.CharField(label='Layer to Use', max_length=20,
+                                widget=forms.TextInput(attrs={'class': 'form-control'}))
+
 class RuleBasesForm(forms.Form):
     ActionChoice = (('Accept', 'Accept'), ('Drop', 'Drop'),)
     LogChoice = (('Log', 'Log'), ('Full Log', 'Full Log'),('Network Log', 'Network Log'), ('None', 'None'),)
-    LayerForm = forms.CharField(label='Layer to Use', max_length=20,
-                                widget=forms.TextInput(attrs={'class': 'form-control'}))
+    # LayerForm = forms.CharField(label='Layer to Use', max_length=20,
+    #                             widget=forms.TextInput(attrs={'class': 'form-control'}))
     RuleName = forms.CharField(label='Rule Name',max_length=20, strip=True,
                                widget = forms.TextInput(attrs={'class': 'form-control',
                                                                'placeholder': 'RuleName'}))
@@ -65,6 +70,8 @@ class RuleBasesForm(forms.Form):
     #     self.fields['FWRulePort'].choices = tcplist + udplist
     #     self.fields['FWRuleOrigin'].choices = hostlists + networks
     #     self.fields['FwRuleDst'].choices = hostlists + networks
+
+MultiRulesForm = formset_factory(RuleBasesForm, min_num=1, extra=2, max_num=10)
 
 class ChoseConsoleForm(forms.Form):
     #MgmtQuery = tuple(MGMTServer.objects.values_list('id', 'ServerIP'))

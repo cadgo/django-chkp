@@ -37,29 +37,26 @@
         <div class="card-body">
             <form action="/r80api/extends/rulesdemo/" method="post">
                 {% csrf_token %}
-                {{ rulesform.management_form }}
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
-                        <label for="{{ layer.LayerForm.id_for_label }}">Layer Append</label>
-                            {{ layer.LayerForm }}<br />
+                        <label for="{{ rulesform.LayerForm.id_for_label }}">Layer Append</label>
+                            {{ rulesform.LayerForm }}<br />
                     </li>
-                    {% for form in rulesform.forms%}
                     <li class="list-group-item">
                         <div class="row">
-                            <label for="{{ form.RuleName.id_for_label }}"></label>
-                            <div class="col-2">
-                                {{ form.RuleName }}
-                            </div>
-                            <label for="{{ form.FWRuleOrigin.id_for_label }}">Dst Origin</label>
-                             {{ form.FWRuleOrigin }}
-                            <label for="{{ form.FwRuleDst.id_for_label }}">Dst Dir</label>
-                            {{ form.FwRuleDst }}
-                            {{ form.FWRulePort }}
-                            {{ form.ActionRule }}
-                            {{ form.LogRule }}
+                        <label for="{{ rulesform.RuleName.id_for_label }}"></label>
+                        <div class="col-2">
+                            {{ rulesform.RuleName }}
+                        </div>
+                        <label for="{{ rulesform.FWRuleOrigin.id_for_label }}">Dst Origin</label>
+                        {{ rulesform.FWRuleOrigin }}
+                        <label for="{{ rulesform.FwRuleDst.id_for_label }}">Dst Dir</label>
+                        {{ rulesform.FwRuleDst }}
+                        {{ rulesform.FWRulePort }}
+                        {{ rulesform.ActionRule }}
+                        {{ rulesform.LogRule }}
                         </div>
                     </li>
-                    {% endfor %}
                 </ul>
                 <input type="submit" class="btn btn-primary" value="SubmitRules">
             </form>
