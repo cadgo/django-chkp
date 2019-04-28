@@ -44,7 +44,7 @@
                             {{ layer.LayerForm }}<br />
                     </li>
                     {% for form in rulesform.forms%}
-                    <li class="list-group-item">
+                    <li class="list-group-item rules" id="EntryForms{{forloop.counter0}}">
                         <div class="row">
                             <label for="{{ form.RuleName.id_for_label }}"></label>
                             <div class="col-2">
@@ -60,6 +60,16 @@
                         </div>
                     </li>
                     {% endfor %}
+                    <li class="list-group-item" id="buttonsSection">
+                        <div class="row">
+                            <div class="col-2">
+                            <button class="btn btn-outline-dark" id="addButon" onclick="cloneElement()">Add Element</button>
+                            </div>
+                            <div class="col-2">
+                            <button class="btn btn-outline-danger" id="deleteElement" onclick="deleteElementForm()">Remove Element</button>
+                            </div>
+                        </div>
+                    </li>
                 </ul>
                 <input type="submit" class="btn btn-primary" value="SubmitRules">
             </form>
@@ -67,9 +77,100 @@
         {% endif %}
     </div>
 </div>
-<!--<form action="/r80api/extends/rulesdemo/" method="post">
-    {% csrf_token %}
-    {{ rulesform.as_table }}
-    <input type="submit" value="Submit_SMS">
-</form>-->
+<script>
+
+    function GetMultiFormData(ElementAttr){
+        $.each(ElementAttr, function (key, value){
+            ElementAttr[key] = $('#'+key).attr("value")
+        });
+    return ElementAttr;
+    }
+
+    function CompareMaxElements(MaxElementSupported, CurrentIndexElement){
+        //return true if we have no arrive to the max element
+        if(Number(MaxElementSupported) == Number(CurrentIndexElement)){
+            return false;
+        }
+        return true;
+    }
+
+    function UpdateFormData(CurrentIndexElement){
+        $("#id_form-TOTAL_FORMS").attr("value", CurrentIndexElement)
+    }
+
+    function CompareMinElement(MinElementSupported, CurrentIndexElement){
+        //console.log(MinElementSupported);
+        //console.log(CurrentIndexElement);
+        if(Number(MinElementSupported) == Number(CurrentIndexElement)){
+            return false;
+        }
+        return true;
+    }
+
+    //El pedo esta aqui no parsea bien lo que se quiere cambiar
+    function modifyData(Element, BaseElementNumber){
+        var ReplaceRegex = /^([A-za-z-_]*)(\d?)([A-Za-z-]*)$/g
+        var idElement = $(Element).attr("id")
+        var newIdElement = idElement.slice(0,idElement.length-1) + BaseElementNumber;
+        $(Element).attr("id", newIdElement)
+        $(Element).find("label").each(function(index, value){
+        	console.log($(this).attr("for"));
+        	$(this).attr("for", $(this).attr("for").replace(ReplaceRegex, "$1"+BaseElementNumber+"$3"))
+        	console.log($(this).attr("for"));
+        	//value.attr("for", value.attr("for").replace(ReplaceRegex, "$1"+BaseElementNumber+"$3"))
+        });
+        $(Element).find("input").each(function (index,value){
+        	$(this).attr("id", $(this).attr("id").replace(ReplaceRegex, "$1"+BaseElementNumber+"$3"))
+        	$(this).attr("name", $(this).attr("name").replace(ReplaceRegex, "$1"+BaseElementNumber+"$3"))
+        });
+        $(Element).find("select").each(function (index,value){
+        	$(this).attr("id", $(this).attr("id").replace(ReplaceRegex, "$1"+BaseElementNumber+"$3"))
+        	$(this).attr("name", $(this).attr("name").replace(ReplaceRegex, "$1"+BaseElementNumber+"$3"))
+        });
+        //var element1= $(Element).find("label").attr("for")
+        //bs = $(Element).find("label")[0]
+        //$(bs).attr("for", element1.replace(ReplaceRegex, "$1"+BaseElementNumber+"$3"))
+        //$(Element).find("input")
+        //    .attr("id", element1.replace(ReplaceRegex, "$1"+BaseElementNumber+"$3"))
+        // var element1= $(Element).find("input").attr("name")
+        // $(Element).find("input")
+        //     .attr("name", element1.replace(ReplaceRegex, "$1"+BaseElementNumber+"$3"))
+        // $(Element).find("select")
+        //     .attr("id", element1.replace(ReplaceRegex, "$1"+BaseElementNumber+"$3"))
+        // var element1= $(Element).find("input").attr("name")
+        // $(Element).find("select")
+        //     .attr("name", element1.replace(ReplaceRegex, "$1"+BaseElementNumber+"$3"))
+        // console.log(element1);
+        //     $("#EntryForms0").find("input").get(0).name
+    }
+    function cloneElement(){
+        ElementsMultiform  = {"id_form-TOTAL_FORMS": "","id_form-MIN_NUM_FORMS": "" , "id_form-MAX_NUM_FORMS": ""};
+        var inputElements = document.getElementsByClassName("rules");
+        var LastElement = inputElements[inputElements.length-1];
+        ElementsMultiform = GetMultiFormData(ElementsMultiform);
+        if (CompareMaxElements(ElementsMultiform['id_form-MAX_NUM_FORMS'], inputElements.length) == false){
+            console.log("Max Number of element for this form")
+            return
+        }
+        UpdateFormData(inputElements.length+1);
+        var cln = LastElement.cloneNode(true);
+        modifyData(cln, inputElements.length)
+        $(cln).insertBefore("#buttonsSection");
+    }
+
+    function deleteElementForm(){
+        ElementsMultiform  = {"id_form-TOTAL_FORMS": "","id_form-MIN_NUM_FORMS": "" , "id_form-MAX_NUM_FORMS": ""}
+        var inputElements = document.getElementsByClassName("rules");
+        //var formElement = document.getElementById("idPost");
+        var LastElement = inputElements[inputElements.length-1];
+        ElementsMultiform = GetMultiFormData(ElementsMultiform);
+        if(CompareMinElement(ElementsMultiform['id_form-MIN_NUM_FORMS'], inputElements.length)== false){
+            console.log("Not Possible to remove elements");
+            return
+        }
+        UpdateFormData(inputElements.length-1);
+        $('#'+LastElement.id).remove();
+    }
+
+</script>
 {% endblock %}

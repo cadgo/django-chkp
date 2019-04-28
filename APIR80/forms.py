@@ -71,7 +71,7 @@ class RuleBasesForm(forms.Form):
     #     self.fields['FWRuleOrigin'].choices = hostlists + networks
     #     self.fields['FwRuleDst'].choices = hostlists + networks
 
-MultiRulesForm = formset_factory(RuleBasesForm, min_num=1, extra=2, max_num=10)
+MultiRulesForm = formset_factory(RuleBasesForm, min_num=1, extra=0, max_num=10)
 
 class ChoseConsoleForm(forms.Form):
     #MgmtQuery = tuple(MGMTServer.objects.values_list('id', 'ServerIP'))
