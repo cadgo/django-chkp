@@ -233,24 +233,6 @@ class RulesDemo(LoginRequiredMixin, View):
                                       rules['LogRule'])
             conn.ChkpPublish()
             conn.LogOutCheckPoint()
-            # for x in form.cleaned_data:
-            #     print(x)
-            #
-
-            # conn = tasks.CheckPointAPI(self.ServerInfo['MgmtServerData'].ServerIP,
-            #                            self.ServerInfo['MgmtServerData'].MgmtPort)
-            # conn.ChkpLogin(self.ServerInfo['MgmtServerUser'].R80User, self.ServerInfo['MgmtServerUser'].R80Password)
-            # conn.ChkpAddAccessLayer(request.POST.get('LayerForm'))
-            # conn.ChkpSetLayerDefaultRuleToAccept('Cleanup rule', request.POST.get('LayerForm'))
-            # conn.ChkpAddAccesRule(request.POST.get('LayerForm'),
-            #                       request.POST.get('RuleName'),
-            #                       request.POST.get('FWRuleOrigin'),
-            #                       request.POST.get('FwRuleDst'),
-            #                       request.POST.get('FWRulePort'),
-            #                       request.POST.get('ActionRule'),
-            #                       request.POST.get('LogRule'))
-            # conn.ChkpPublish()
-            # conn.LogOutCheckPoint()
         else:
             print("No es valida")
             SuspiciousOperation("Invalid request: not able to process the form")

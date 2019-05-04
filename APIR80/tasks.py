@@ -364,13 +364,13 @@ class CheckPointAPI():
         return response
 
 
-class CheckPointEConnection(CheckPointAPI):
-    def __init__(self, user, password, IP):
-        self.user = user
-        self.password = password
-        self.IP = IP
-        super().__init__(IP)
-        self.ConnectionData= super().ChkpLogin()
+# class CheckPointEConnection(CheckPointAPI):
+#     def __init__(self, user, password, IP):
+#         self.user = user
+#         self.password = password
+#         self.IP = IP
+#         super().__init__(IP)
+#         self.ConnectionData= super().ChkpLogin()
 
 
 
