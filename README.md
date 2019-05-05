@@ -46,6 +46,8 @@ Using docker-compose
 
 #sudo docker-compose up
 
+![screenshot](https://github.com/cadgo/django-chkp/blob/assets/docker-compose.png)
+
 ![screenshot](https://github.com/cadgo/django-chkp/blob/assets/dockerimage.PNG)
 
 First steps using the web interface.
