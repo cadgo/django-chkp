@@ -30,6 +30,7 @@ Tasks.py - The R80 API is represented in this file.
 This app is designet to run using docker, the first step to deploy it is using Docker.
 
 1.- Install Docker following the instructions for your Linux Distro
+
 2.- Download this repository using GIT.
 
 for development version
@@ -41,26 +42,16 @@ https://github.com/cadgo/django-chkp/archive/1.tar.gz
 
 3.- Use the Dockerfile inside the created folder 
 
-sudo docker build -t chkpdjango .
+Using docker-compose 
 
-Don't forget the dot at the end of the command
-
-This will generate a Docker image 
-
-sudo docker image ls -a
+#sudo docker-compose up
 
 ![screenshot](https://github.com/cadgo/django-chkp/blob/assets/dockerimage.PNG)
-
-We can run the container in this way
-sudo docker run -it --network=host chkpdjango /bin/bash
-
-to Run the server we need to execute
-
-#python3 manage.py runserver 0.0.0.0:8000
 
 First steps using the web interface.
 
 1.- Create an API user in our Smart Center Server
+
 2.- Enable the API for all IPs
 
 We need to add the smart center server inside our database using this URL http://IPADDRESS:8000/admin/
@@ -115,11 +106,6 @@ R80User: the username for example api_user
 
 R80password: The username password
 
-Stop the web server inside our docker  just pressing cntr+c inside here
-
-![Screeshot](https://github.com/cadgo/django-chkp/blob/assets/stopWebServer.PNG)
-
-And run it again!
 
 We are ready to use our web interface, we can follow the next link http://IPADDRESS:8000/r80api/extends
   
@@ -146,7 +132,6 @@ Action: Accept
 Log: :)
 
 ![screenshot](https://github.com/cadgo/django-chkp/blob/assets/RuleBase.png)
-
 
 it will create a new Layer like
 
