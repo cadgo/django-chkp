@@ -37,8 +37,7 @@ for development version
 git clone https://github.com/cadgo/django-chkp.git
 
 or use the relased tested (recomended)
-https://github.com/cadgo/django-chkp/archive/1.zip
-https://github.com/cadgo/django-chkp/archive/1.tar.gz
+https://github.com/cadgo/django-chkp/archive/1.1.tar.gz
 
 3.- Use the Dockerfile inside the created folder 
 
