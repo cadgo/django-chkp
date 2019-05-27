@@ -51,6 +51,8 @@ Using docker-compose
 
 First steps using the web interface.
 
+NOTE: CREATE AT LEAST 4 NETWORK AND HOST OBJECTS INSIDE THE SMART CENTER SERVER TO PERFORM A BETTER DEMO OR USE THE WEB INTERFACE TO DO IT!!
+
 1.- Create an API user in our Smart Center Server
 
 2.- Enable the API for all IPs
