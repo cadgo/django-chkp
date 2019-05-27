@@ -49,8 +49,10 @@ class RulesDemo(LoginRequiredMixin, View):
         VALIDAR LOS TOTALES DE LOS OBJECTOS PARA IR POR TODOS DE UN JALON PARA QUE SOLO GENERE UN ARCHIVO EN BLANCO
         En el caso de los puertos tcp solo vamos por 217 arreglar eso a traves del wrapper para siempre ir por los totales.
         """
-        conn = tasks.CheckPointAPI(self.ServerInfo['MgmtServerData'].ServerIP,
-                                   self.ServerInfo['MgmtServerData'].MgmtPort)
+        APIChoose = tasks.CheckPointFactory_Connection(self.ServerInfo['MgmtServerData'].MgmtR80ApiVersion)
+        #conn = tasks.CheckPointAPI(self.ServerInfo['MgmtServerData'].ServerIP,
+        #                           self.ServerInfo['MgmtServerData'].MgmtPort)
+        conn = APIChoose(self.ServerInfo['MgmtServerData'].ServerIP, self.ServerInfo['MgmtServerData'].MgmtPort)
         fileTCPPorts = Path(self.ServerInfo['MgmtObjects'].MGMTServerFilePathTCPPorts)
         fileUDPPorts= Path(self.ServerInfo['MgmtObjects'].MGMTServerFilePathUDPPorts)
         fileObjects = Path(self.ServerInfo['MgmtObjects'].MGMTServerFilePathNetObjects)
@@ -215,8 +217,10 @@ class RulesDemo(LoginRequiredMixin, View):
             if TotalForms > MaxNumForms:
                 SuspiciousOperation("Invalid request: not able to process the form")
             layer = layerform.cleaned_data["LayerForm"]
-            conn = tasks.CheckPointAPI(self.ServerInfo['MgmtServerData'].ServerIP,
-                                        self.ServerInfo['MgmtServerData'].MgmtPort)
+            APIChoose = tasks.CheckPointFactory_Connection(self.ServerInfo['MgmtServerData'].MgmtR80ApiVersion)
+            # conn = tasks.CheckPointAPI(self.ServerInfo['MgmtServerData'].ServerIP,
+            #                           self.ServerInfo['MgmtServerData'].MgmtPort)
+            conn = APIChoose(self.ServerInfo['MgmtServerData'].ServerIP, self.ServerInfo['MgmtServerData'].MgmtPort)
             conn.ChkpLogin(self.ServerInfo['MgmtServerUser'].R80User, self.ServerInfo['MgmtServerUser'].R80Password)
             conn.ChkpAddAccessLayer(layer)
             conn.ChkpSetLayerDefaultRuleToAccept('Cleanup rule', layer)
@@ -274,8 +278,10 @@ class RulesDemo(LoginRequiredMixin, View):
         form = self.form_class(data=request.POST, tcplist=self.GetListTCPObjects(), udplist=self.GetListUDPObjects(),hostlists=self.GetListHostsObjects(), networks=self.GetListNetworkObjects())
         if form.is_valid():
             print("Es valida")
-            conn = tasks.CheckPointAPI(self.ServerInfo['MgmtServerData'].ServerIP,
-                                       self.ServerInfo['MgmtServerData'].MgmtPort)
+            APIChoose = tasks.CheckPointFactory_Connection(self.ServerInfo['MgmtServerData'].MgmtR80ApiVersion)
+            # conn = tasks.CheckPointAPI(self.ServerInfo['MgmtServerData'].ServerIP,
+            #                           self.ServerInfo['MgmtServerData'].MgmtPort)
+            conn = APIChoose(self.ServerInfo['MgmtServerData'].ServerIP, self.ServerInfo['MgmtServerData'].MgmtPort)
             conn.ChkpLogin(self.ServerInfo['MgmtServerUser'].R80User, self.ServerInfo['MgmtServerUser'].R80Password)
             conn.ChkpAddAccessLayer(request.POST.get('LayerForm'))
             conn.ChkpSetLayerDefaultRuleToAccept('Cleanup rule', request.POST.get('LayerForm'))
@@ -385,7 +391,9 @@ class CreateHostView(LoginRequiredMixin, FormView):
                                                             name, ipv4host))
                 serverInfo = models.MGMTServer.objects.get(pk=CreateHostView.MgmtServer)
                 LoginInfo = models.R80Users.objects.get(UsersID=CreateHostView.MgmtServer)
-                conn = tasks.CheckPointAPI(serverInfo.ServerIP, serverInfo.MgmtPort)
+                APIChoose = tasks.CheckPointFactory_Connection(serverInfo.MgmtR80ApiVersion)
+                conn = APIChoose(serverInfo.ServerIP, serverInfo.MgmtPort)
+                #conn = tasks.CheckPointAPI(serverInfo.ServerIP, serverInfo.MgmtPort)
                 conn.ChkpLogin(LoginInfo.R80User, LoginInfo.R80Password)
                 conn.ChkpCreateHost(name, ipv4host)
                 conn.ChkpPublish()
@@ -402,7 +410,9 @@ class CreateHostView(LoginRequiredMixin, FormView):
                                                             name, ipv4host))
                 serverInfo = models.MGMTServer.objects.get(pk=CreateHostView.MgmtServer)
                 LoginInfo = models.R80Users.objects.get(UsersID=CreateHostView.MgmtServer)
-                conn = tasks.CheckPointAPI(serverInfo.ServerIP, serverInfo.MgmtPort)
+                APIChoose = tasks.CheckPointFactory_Connection(serverInfo.MgmtR80ApiVersion)
+                conn = APIChoose(serverInfo.ServerIP, serverInfo.MgmtPort)
+                #conn = tasks.CheckPointAPI(serverInfo.ServerIP, serverInfo.MgmtPort)
                 conn.ChkpLogin(LoginInfo.R80User, LoginInfo.R80Password)
                 if srcnat == 'behind GW':
                     print('Nat behindGW')
@@ -428,7 +438,9 @@ class CreateHostView(LoginRequiredMixin, FormView):
                 staticIP = form.cleaned_data['NatIP']
                 serverInfo = models.MGMTServer.objects.get(pk=CreateHostView.MgmtServer)
                 LoginInfo = models.R80Users.objects.get(UsersID=CreateHostView.MgmtServer)
-                conn = tasks.CheckPointAPI(serverInfo.ServerIP, serverInfo.MgmtPort)
+                APIChoose = tasks.CheckPointFactory_Connection(serverInfo.MgmtR80ApiVersion)
+                conn = APIChoose(serverInfo.ServerIP, serverInfo.MgmtPort)
+                #conn = tasks.CheckPointAPI(serverInfo.ServerIP, serverInfo.MgmtPort)
                 conn.ChkpLogin(LoginInfo.R80User, LoginInfo.R80Password)
                 conn.ChkpCreateHost(name, ipv4host, 'static', staticIP)
                 conn.ChkpPublish()
@@ -472,7 +484,9 @@ class CreateNetworkView(LoginRequiredMixin, FormView):
                                                             name, ipv4NetAddress, subnet))
                 serverInfo = models.MGMTServer.objects.get(pk=CreateHostView.MgmtServer)
                 LoginInfo = models.R80Users.objects.get(UsersID=CreateHostView.MgmtServer)
-                conn = tasks.CheckPointAPI(serverInfo.ServerIP, serverInfo.MgmtPort)
+                APIChoose = tasks.CheckPointFactory_Connection(serverInfo.MgmtR80ApiVersion)
+                conn = APIChoose(serverInfo.ServerIP, serverInfo.MgmtPort)
+                #conn = tasks.CheckPointAPI(serverInfo.ServerIP, serverInfo.MgmtPort)
                 conn.ChkpLogin(LoginInfo.R80User, LoginInfo.R80Password)
                 conn.ChkpCreateNetwork(name, ipv4NetAddress, subnet)
                 conn.ChkpPublish()
@@ -492,7 +506,9 @@ class CreateNetworkView(LoginRequiredMixin, FormView):
                                                                 name, ipv4NetAddress))
                 serverInfo = models.MGMTServer.objects.get(pk=CreateHostView.MgmtServer)
                 LoginInfo = models.R80Users.objects.get(UsersID=CreateHostView.MgmtServer)
-                conn = tasks.CheckPointAPI(serverInfo.ServerIP, serverInfo.MgmtPort)
+                APIChoose = tasks.CheckPointFactory_Connection(serverInfo.MgmtR80ApiVersion)
+                conn = APIChoose(serverInfo.ServerIP, serverInfo.MgmtPort)
+                #conn = tasks.CheckPointAPI(serverInfo.ServerIP, serverInfo.MgmtPort)
                 conn.ChkpLogin(LoginInfo.R80User, LoginInfo.R80Password)
                 if srcnat == 'behind GW':
                     print('Nat behindGW')
@@ -520,7 +536,9 @@ class CreateNetworkView(LoginRequiredMixin, FormView):
                 subnet = form.cleaned_data['subnet']
                 serverInfo = models.MGMTServer.objects.get(pk=CreateHostView.MgmtServer)
                 LoginInfo = models.R80Users.objects.get(UsersID=CreateHostView.MgmtServer)
-                conn = tasks.CheckPointAPI(serverInfo.ServerIP, serverInfo.MgmtPort)
+                APIChoose = tasks.CheckPointFactory_Connection(serverInfo.MgmtR80ApiVersion)
+                conn = APIChoose(serverInfo.ServerIP, serverInfo.MgmtPort)
+                #conn = tasks.CheckPointAPI(serverInfo.ServerIP, serverInfo.MgmtPort)
                 conn.ChkpLogin(LoginInfo.R80User, LoginInfo.R80Password)
                 conn.ChkpCreateNetwork(name, ipv4NetAddress, subnet,'static', staticIP)
                 conn.ChkpPublish()

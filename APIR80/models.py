@@ -5,12 +5,14 @@ from chkp import settings
 
 # Create your models here.
 class MGMTServer(models.Model):
+    ApiSupportedVersions = (('1_1', '1_1'),)
     MgmtR80Name = models.CharField(max_length=250)
     ServerIP = models.GenericIPAddressField()
     Description = models.TextField(max_length=500)
     SupportedVersion = (('R80', 'R80'),
-                        ('R80.10', 'R80.10'),)
+                        ('R8010', 'R80.10'),)
     MgmtR80VersionsSupported = models.CharField(max_length=10, choices=SupportedVersion,default='R80.10')
+    MgmtR80ApiVersion = models.CharField(max_length=4, choices = ApiSupportedVersions, default='1_1')
     MGMTR80IsAlive = models.BooleanField(default=True)
     MgmtFingerPrintAPI = models.CharField(max_length=100, default='not defined')
     MgmtPort = models.PositiveIntegerField(validators=[MaxValueValidator(65525)], default=443)

@@ -9,7 +9,7 @@ class ChoiceInline(admin.TabularInline):
 # Register your models here.
 
 class MGMTServerAdminPortal(admin.ModelAdmin):
-    list_display = ('MgmtR80Name','ServerIP', 'Description', 'SupportedVersion')
+    list_display = ('MgmtR80Name','ServerIP', 'Description', 'MgmtR80ApiVersion')
 
 class R80UsersForm(forms.ModelForm):
     R80Password = forms.CharField(widget=forms.PasswordInput)

@@ -1,8 +1,8 @@
 from background_task import background
-import json, http.client, httplib2
+import json, http.client
 import os, ssl
-from django.http import HttpResponse
 from django.http import Http404
+import importlib
 
 if (not os.environ.get('PYTHONHTTPSVERIFY', '') and
         getattr(ssl, '_create_unverified_context', None)):
@@ -18,6 +18,7 @@ Por algo en donde se pueda ir por el status, se puede poner esto como funcion
 class CheckPointAPI():
     ChkpPort = 443
     ChkpIP = None
+    URI1  = 'web_api'
 
     def __init__(self, ChkpIP, ChkpPort):
         self.ChkpIP=ChkpIP
@@ -38,22 +39,27 @@ class CheckPointAPI():
         assert KeepAlive <= self.MaxKeepAliveSeconds, "KeepAlive Must be an Integer Between 0 and {}".format(self.MaxKeepAliveSeconds)
         self.KeepAlive = KeepAlive
 
-    def __ChkpValidateSID(self):
+    def ChkpValidateSID(self):
         try:
             sid = self.Headers['X-chkp-sid']
         except KeyError:
             raise Http404('BackEnd Error lets try first with a Login')
 
-    def __ChkpValidConnection(self, Path, body, method = 'POST'):
+    def ChkpValidConnection(self, Path, body, method ='POST'):
         try:
             self.connection.request(method, Path, headers=self.Headers, body=body)
         except Exception:
             raise Http404("Error sending data to backend")
 
-    def __ChkpCheckHTTPReturnCode(self, conn):
+    def ChkpCheckHTTPReturnCode(self, conn):
         print("Connection Status {}".format(conn.status))
         if str(conn.status) in self.APIErrors:
             raise Http404('API Error Code {}'.format(conn.status))
+
+
+
+class apiv1_1(CheckPointAPI):
+    apiVersion = 'v1.1'
 
     def ChkpLogin(self, user, password):
         """Agregar mas validadores
@@ -64,7 +70,8 @@ class CheckPointAPI():
                  print(response.status)
             No solo el tamaño del SID
         """
-        PathAppend = '/web_api/login'
+        c = 'login'
+        PathAppend = '/{}/{}/{}'.format(self.URI1,self.apiVersion,c) if len(self.apiVersion)>0 else '/{}/{}'.format(self.URI1,c)
         data = {
             'user': user,
             'password': password
@@ -78,7 +85,7 @@ class CheckPointAPI():
             raise Http404("Error sending data to backend")
         #self.__ChkpCheckHTTPReturnCode()
         conn = self.connection.getresponse()
-        self.__ChkpCheckHTTPReturnCode(conn)
+        self.ChkpCheckHTTPReturnCode(conn)
         #response = json.loads(self.connection.getresponse().read().decode())
         response = json.loads(conn.read().decode())
         print(response)
@@ -90,25 +97,27 @@ class CheckPointAPI():
 
     def ChkpPublish(self):
         print('publish function')
-        PathAppend = '/web_api/publish'
+        c='publish'
+        PathAppend = '/{}/{}/{}'.format(self.URI1,self.apiVersion,c) if len(self.apiVersion)>0 else '/{}/{}'.format(self.URI1,c)
         data = { }
         jdata = json.dumps(data)
-        self.__ChkpValidateSID()
-        self.__ChkpValidConnection(PathAppend, jdata)
+        self.ChkpValidateSID()
+        self.ChkpValidConnection(PathAppend, jdata)
         conn = self.connection.getresponse()
-        self.__ChkpCheckHTTPReturnCode(conn)
+        self.ChkpCheckHTTPReturnCode(conn)
         response = json.loads(conn.read().decode())
         #print(response)
 
     def LogOutCheckPoint(self):
         print('Logout function')
-        PathAppend = '/web_api/logout'
+        c='logout'
+        PathAppend = '/{}/{}/{}'.format(self.URI1,self.apiVersion,c) if len(self.apiVersion) > 0 else '/{}/{}'.format(self.URI1,c)
         data = { }
         jdata = json.dumps(data)
-        self.__ChkpValidateSID()
-        self.__ChkpValidConnection(PathAppend, jdata)
+        self.ChkpValidateSID()
+        self.ChkpValidConnection(PathAppend, jdata)
         conn = self.connection.getresponse()
-        self.__ChkpCheckHTTPReturnCode(conn)
+        self.ChkpCheckHTTPReturnCode(conn)
         response = json.loads(conn.read().decode())
         print(response)
         if response['message'] != "OK":
@@ -117,39 +126,42 @@ class CheckPointAPI():
 
     def ChkpAddAccessLayer(self, LayerNane):
         print('Access layer')
-        PathAppend = '/web_api/add-access-layer'
+        c='add-access-layer'
+        PathAppend = '/{}/{}/{}'.format(self.URI1,self.apiVersion,c) if len(self.apiVersion) > 0 else '/{}/{}'.format(self.URI1,c)
         data = {
             'name': LayerNane,
             'add-default-rule': True,
             'firewall': True
         }
         jdata = json.JSONEncoder().encode(data)
-        self.__ChkpValidateSID()
-        self.__ChkpValidConnection(PathAppend, jdata)
+        self.ChkpValidateSID()
+        self.ChkpValidConnection(PathAppend, jdata)
         conn = self.connection.getresponse()
-        self.__ChkpCheckHTTPReturnCode(conn)
+        self.ChkpCheckHTTPReturnCode(conn)
         response = json.loads(conn.read().decode())
         #print("aaaaaaaa {}".format(response))
         #{'code': 'generic_err_invalid_parameter_name', 'message': 'Unrecognized parameter [implicit-cleanup-action]'}
 
     def ChkpSetLayerDefaultRuleToAccept(self, rulename, layer, action='Accept'):
         print('default rule to accept')
-        PathAppend = '/web_api/set-access-rule'
+        c='set-access-rule'
+        PathAppend = '/{}/{}/{}'.format(self.URI1,self.apiVersion,c) if len(self.apiVersion) > 0 else '/{}/{}'.format(self.URI1,c)
         data = {
             'name': rulename,
             'layer': layer,
             'action': action
         }
         jdata = json.JSONEncoder().encode(data)
-        self.__ChkpValidateSID()
-        self.__ChkpValidConnection(PathAppend, jdata)
+        self.ChkpValidateSID()
+        self.ChkpValidConnection(PathAppend, jdata)
         conn = self.connection.getresponse()
-        self.__ChkpCheckHTTPReturnCode(conn)
+        self.ChkpCheckHTTPReturnCode(conn)
         print("bbbbb {}".format(conn.read().decode()))
 
     def ChkpAddAccesRule(self, layer, name, source,
                          destination, service, action, track):
-        PathAppend = "/web_api/add-access-rule"
+        c='add-access-rule'
+        PathAppend = '/{}/{}/{}'.format(self.URI1,self.apiVersion,c) if len(self.apiVersion) > 0 else '/{}/{}'.format(self.URI1,c)
         data = {
             'layer': layer,
             'position': 'top',
@@ -161,23 +173,24 @@ class CheckPointAPI():
             'track': {'type': track}
         }
         jdata = json.JSONEncoder().encode(data)
-        self.__ChkpValidateSID()
-        self.__ChkpValidConnection(PathAppend, jdata)
+        self.ChkpValidateSID()
+        self.ChkpValidConnection(PathAppend, jdata)
         conn = self.connection.getresponse()
-        self.__ChkpCheckHTTPReturnCode(conn)
+        self.ChkpCheckHTTPReturnCode(conn)
         response = json.loads(conn.read().decode())
         return response
 
 
     def ChkpShowServicesTCP(self, offset=0, limit=217):
-        PathAppend = '/web_api/show-services-tcp'
+        c='show-services-tcp'
+        PathAppend = '/{}/{}/{}'.format(self.URI1,self.apiVersion,c) if len(self.apiVersion) > 0 else '/{}/{}'.format(self.URI1,c)
         data = {
             'limit': limit,
             'offset': offset,
             'details-level':  "standard"
         }
         jdata = json.JSONEncoder().encode(data)
-        self.__ChkpValidateSID()
+        self.ChkpValidateSID()
         # for i in range(retries):
         #     try:
         #         self.connection.request('POST', PathAppend, headers=self.Headers, body=jdata)
@@ -186,24 +199,25 @@ class CheckPointAPI():
         #             continue
         #         else:
         #             raise Http404('Max Retries for Show Services')
-        self.__ChkpValidConnection(PathAppend, jdata)
+        self.ChkpValidConnection(PathAppend, jdata)
         conn = self.connection.getresponse()
-        self.__ChkpCheckHTTPReturnCode(conn)
+        self.ChkpCheckHTTPReturnCode(conn)
         response = json.loads(conn.read().decode())
         return response
 
     def ChkpShowNetworks(self, offset=0, limit=217):
-        PathAppend = '/web_api/show-networks'
+        c='show-networks'
+        PathAppend = '/{}/{}/{}'.format(self.URI1,self.apiVersion,c) if len(self.apiVersion) > 0 else '/{}/{}'.format(self.URI1,c)
         data = {
             'limit': limit,
             'offset': offset,
             'details-level':  "standard"
         }
         jdata = json.JSONEncoder().encode(data)
-        self.__ChkpValidateSID()
-        self.__ChkpValidConnection(PathAppend, jdata)
+        self.ChkpValidateSID()
+        self.ChkpValidConnection(PathAppend, jdata)
         conn = self.connection.getresponse()
-        self.__ChkpCheckHTTPReturnCode(conn)
+        self.ChkpCheckHTTPReturnCode(conn)
         response = json.loads(conn.read().decode())
         return response
 
@@ -226,14 +240,15 @@ class CheckPointAPI():
             return data
 
     def ChkpShowServicesUDP(self, offset=0, limit=94):
-        PathAppend = '/web_api/show-services-udp'
+        c='show-services-udp'
+        PathAppend = '/{}/{}/{}'.format(self.URI1,self.apiVersion,c) if len(self.apiVersion) > 0 else '/{}/{}'.format(self.URI1,c)
         data = {
             'limit': limit,
             'offset': offset,
             'details-level':  "standard"
         }
         jdata = json.JSONEncoder().encode(data)
-        self.__ChkpValidateSID()
+        self.ChkpValidateSID()
         # for i in range(retries):
         #     try:
         #         self.connection.request('POST', PathAppend, headers=self.Headers, body=jdata)
@@ -242,9 +257,9 @@ class CheckPointAPI():
         #             continue
         #         else:
         #             raise Http404('Max Retries for Show Services')
-        self.__ChkpValidConnection(PathAppend, jdata)
+        self.ChkpValidConnection(PathAppend, jdata)
         conn = self.connection.getresponse()
-        self.__ChkpCheckHTTPReturnCode(conn)
+        self.ChkpCheckHTTPReturnCode(conn)
         response = json.loads(conn.read().decode())
         return response
 
@@ -258,17 +273,18 @@ class CheckPointAPI():
             return data
 
     def ChkpShowHosts(self, offset=0, limit=217):
-        PathAppend = '/web_api/show-hosts'
+        c='show-hosts'
+        PathAppend = '/{}/{}/{}'.format(self.URI1,self.apiVersion,c) if len(self.apiVersion) > 0 else '/{}/{}'.format(self.URI1,c)
         data = {
             'limit': limit,
             'offset': offset,
             'details-level': "standard"
         }
         jdata = json.JSONEncoder().encode(data)
-        self.__ChkpValidateSID()
-        self.__ChkpValidConnection(PathAppend, jdata)
+        self.ChkpValidateSID()
+        self.ChkpValidConnection(PathAppend, jdata)
         conn = self.connection.getresponse()
-        self.__ChkpCheckHTTPReturnCode(conn)
+        self.ChkpCheckHTTPReturnCode(conn)
         response = json.loads(conn.read().decode())
         return response
 
@@ -282,18 +298,20 @@ class CheckPointAPI():
             return data
 
     def ChkpShowLastPublishedSession(self):
-        PathAppend = "/web_api/show-last-published-session"
+        c='show-last-published-session'
+        PathAppend = '/{}/{}/{}'.format(self.URI1, self.apiVersion,c) if len(self.apiVersion) > 0 else '/{}/{}'.format(self.URI1,c)
         data = { }
         jdata = json.JSONEncoder().encode(data)
-        self.__ChkpValidateSID()
-        self.__ChkpValidConnection(PathAppend, jdata)
+        self.ChkpValidateSID()
+        self.ChkpValidConnection(PathAppend, jdata)
         conn = self.connection.getresponse()
-        self.__ChkpCheckHTTPReturnCode(conn)
+        self.ChkpCheckHTTPReturnCode(conn)
         response= json.loads(conn.read().decode())
         return response
 
     def ChkpCreateHost(self, name, ipv4address, natmethod='no', natparameters='gateway'):
-        PathAppend = "/web_api/add-host"
+        c='add-host'
+        PathAppend = '/{}/{}/{}'.format(self.URI1, self.apiVersion, c) if len(self.apiVersion) > 0 else '/{}/{}'.format(self.URI1,c)
         data = {
              'name': name,
              'ip-address': ipv4address
@@ -320,15 +338,16 @@ class CheckPointAPI():
         # }.get(natmethod, lambda: None)
         jdata = json.JSONEncoder().encode(data)
         print(jdata)
-        self.__ChkpValidateSID()
-        self.__ChkpValidConnection(PathAppend, jdata)
+        self.ChkpValidateSID()
+        self.ChkpValidConnection(PathAppend, jdata)
         conn = self.connection.getresponse()
-        self.__ChkpCheckHTTPReturnCode(conn)
+        self.ChkpCheckHTTPReturnCode(conn)
         response = json.loads(conn.read().decode())
         return response
 
     def ChkpCreateNetwork(self, name, ipv4address, mask ,natmethod='no', natparameters='gateway'):
-        PathAppend = "/web_api/add-network"
+        c='add-network'
+        PathAppend = '/{}/{}/{}'.format(self.URI1, self.apiVersion,c) if len(self.apiVersion) > 0 else '/{}/{}'.format(self.URI1,c)
         data = {
              'name': name,
              'subnet': ipv4address,
@@ -356,12 +375,22 @@ class CheckPointAPI():
         # }.get(natmethod, lambda: None)
         jdata = json.JSONEncoder().encode(data)
         print(jdata)
-        self.__ChkpValidateSID()
-        self.__ChkpValidConnection(PathAppend, jdata)
+        self.ChkpValidateSID()
+        self.ChkpValidConnection(PathAppend, jdata)
         conn = self.connection.getresponse()
-        self.__ChkpCheckHTTPReturnCode(conn)
+        self.ChkpCheckHTTPReturnCode(conn)
         response = json.loads(conn.read().decode())
         return response
+
+class apiv1_2(apiv1_1):
+    def HolaMundoR8020(self):
+        print('HolaMundo 8020')
+
+def CheckPointFactory_Connection(MgmtVersion):
+    GeneralName = 'apiv' + MgmtVersion
+    #print(os.path.basename(__file__))
+    NewClass = getattr(importlib.import_module('APIR80.tasks'), GeneralName)
+    return NewClass
 
 
 # class CheckPointEConnection(CheckPointAPI):
