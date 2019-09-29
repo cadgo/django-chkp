@@ -4,12 +4,13 @@
 {% endblock %}
 {% block content %}
 <!--<div class="album" style="background-color: #ccf2ff">-->
+{% load static %}
 <div class="album">
     <div class="container">
         <div class="row">
             <div class="col-md-4">
                 <div class="card mb-4 shadow-sm">
-                    <img class="card-img.top" src="https://upload.wikimedia.org/wikipedia/commons/0/05/Ansible_Logo.png" alt="Ansible" align="center">
+                    <img class="card-img.top" src="{% static 'pictures/Ansible_logo.jpg'%}" alt="Ansible" align="center" height=300 width="300">
                     <div class="card-body">
                         <p class="card-text">Demostración de orquestación con tecnología ansible. Ansible permite de forma remota configurar los equipos además de integrar múltiples tecnologías</p>
                         <div class="d-flex justify-content-between align-items-center">
@@ -24,7 +25,7 @@
             </div>
             <div class="col-md-4">
                 <div class="card mb-4 shadow-sm">
-                    <img class="card-img.top" src="http://qostechnology.in/wp-content/uploads/2017/08/offline-migration-of-management-server-from-r77-to-r80.jpg" alt="Check Point R80.10"
+                    <img class="card-img.top" src="{% static 'pictures/r80image.jpg' %}" alt="Check Point R80.10"
                          style="height: 225px; width: 100%; display: block;">
                     <div class="card-body">
                         <p class="card-text">Demostraccion de generacion de reglas de seguridad a traves de la API de R80</p>
@@ -32,6 +33,22 @@
                             <div class="btn-group">
                                 <form action="{% url 'rulesdemo' %}" method="get">
                                     {{ form.as_p }}
+                                    <input class="btn btn-sm btn-outline-secondary" type="submit" value="Ejecutar">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <img class="card-img.top" src="{% static 'pictures/smb1.png' %}" alt="Check Point R80.10"
+                         style="height: 225px; width: 100%; display: block;">
+                    <div class="card-body">
+                        <p class="card-text">SMB Devices and zero touch api</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group">
+                                <form action="{% url 'smbdeploy' %}" method="get">
                                     <input class="btn btn-sm btn-outline-secondary" type="submit" value="Ejecutar">
                                 </form>
                             </div>

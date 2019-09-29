@@ -24,6 +24,14 @@ class MGMTServerObjectsAdmin(admin.ModelAdmin):
 class MGMTServerObjectsAdminObjects(admin.ModelAdmin):
     list_display = ('MGMTServerObjectsNetworksID', 'MGMTServerFilePathNetObjects')
 
+class ZeroTouchUsersForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput)
+
+class ZeroTouchUsersAdmin(admin.ModelAdmin):
+    form = ZeroTouchUsersForm
+    list_display = ('username',)
+
 admin.site.register(MGMTServer, MGMTServerAdminPortal)
 admin.site.register(R80Users, R80UsersAdmin)
 admin.site.register(MGMTServerObjects, MGMTServerObjectsAdmin)
+admin.site.register(ZeroTouchLoginModel, ZeroTouchUsersAdmin)

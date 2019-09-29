@@ -1,0 +1,10 @@
+{% extends 'APIR80/base.html' %}
+{% block title %}
+    Check Point Automation
+{% endblock %}
+{% block content %}
+<form action="{% url 'smbdeploy' %}" method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="deploy">
+</form>
+{% endblock %}

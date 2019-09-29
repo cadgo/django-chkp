@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from . import models, forms
 from . import tasks
 from .models import R80Users, MGMTServer
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousOperation, EmptyResultSet
 from django.shortcuts import redirect
 from pathlib import Path
 from django.views.generic.edit import FormView
@@ -548,3 +548,31 @@ class CreateNetworkView(LoginRequiredMixin, FormView):
                                                     'dummyhide': self.dummyhideNatJS(),
                                                     'dummyStatic': self.dummystaticNatJS(),
                                                     'posturl': 'createnetwork'})
+
+class SMBDeployView(LoginRequiredMixin, FormView):
+    template_name = 'APIR80/smbdeploy.html'
+    form_class = forms.SMBDeployment
+    login_url = '../../r80api/accounts/login/'
+    success_url = "extends/rulesdemo/"
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            print("Recibimos algo")
+            TemplateName = form.cleaned_data['TemplateName']
+            DevPassword = form.cleaned_data['SMBAdminPassword']
+            AccID = form.cleaned_data['SMBAccID']
+            ObjectName = form.cleaned_data['ObjectName']
+            DeviceMac = form.cleaned_data['DeviceMac']
+            logininfo = models.ZeroTouchLoginModel.objects.all()
+            index= len(logininfo)
+            if index == 0:
+                raise EmptyResultSet
+            print('{} {}'.format(logininfo[index-1].username,logininfo[index-1].password))
+            print(TemplateName)
+            zt = tasks.ZeroTouchAPI()
+            zt.ZeroTouchLogin(logininfo[index-1].username, logininfo[index-1].password)
+            ztemp = zt.ZeroTouchAddTemplate(TemplateName, DevPassword, AccID)
+            print(ztemp['template-id'])
+            zt.ZeroTouchClaimGW(ObjectName, AccID, ztemp['template-id'], DeviceMac)
+        return render(request,self.template_name)

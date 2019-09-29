@@ -1,4 +1,4 @@
-from .models import R80Users, MGMTServer
+from .models import R80Users, ZeroTouchLoginModel
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.forms import formset_factory
@@ -16,12 +16,17 @@ class R80UsersForm(forms.ModelForm):
         model = R80Users
         fields = ['UsersID', 'R80User', 'R80Password']
 
-
 class AnsibleSMSDeploy(forms.Form):
     SmartCenterName = forms.CharField(label='SMS Name', max_length=20)
     SubNetIPAddress = forms.GenericIPAddressField(label='IP Address', protocol="IPv4")
     SMSDeployFormHidden = forms.CharField(widget=forms.HiddenInput, initial='True')
 
+class SMBDeployment(forms.Form):
+    TemplateName = forms.CharField(label='Template Name', max_length=20)
+    SMBAdminPassword = forms.CharField(label='Device Password', widget=forms.PasswordInput())
+    SMBAccID = forms.CharField(label='Acc ID', max_length=30)
+    ObjectName = forms.CharField(label='Hostname', max_length=20)
+    DeviceMac = forms.CharField(label='MAC', max_length=20)
 
 class AnsibleFWDeploy(forms.Form):
     FirewallName = forms.CharField(label='Fw Name', max_length=20)

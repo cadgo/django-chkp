@@ -14,6 +14,7 @@ urlpatterns = [
     path('extends/createhost/', views.CreateHostView.as_view(), name='createhost'),
     path('extends/createnetwork/', views.CreateNetworkView.as_view(), name='createnetwork'),
     path('accounts/login/', auth_views.LoginView.as_view(form_class=MyLoginForm), name='login'),
-    path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout')
+    path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('extends/smbdeploy/', views.SMBDeployView.as_view(), name='smbdeploy')
     #path('accounts/', include('django.contrib.auth.urls'), name='loginpage')
 ]

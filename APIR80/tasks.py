@@ -56,7 +56,77 @@ class CheckPointAPI():
         if str(conn.status) in self.APIErrors:
             raise Http404('API Error Code {}'.format(conn.status))
 
+class ZeroTouchAPI(CheckPointAPI):
+    ZeroTouchURI = '/ZeroTouch/web_api/v2/'
 
+    def __init__(self):
+        super().__init__(0,0)
+        self.ChkpURL = "zerotouch.checkpoint.com"
+
+    def ZeroTouchLogin(self, username, password):
+        c ='login'
+        PathAppend = self.ZeroTouchURI +c
+        data = {
+            'user': username,
+            'password': password
+        }
+        jdata = json.dumps(data)
+        # agregar manejo de excepciones como timeout
+        self.connection = http.client.HTTPSConnection(self.ChkpURL)
+        print(self.ChkpURL + PathAppend)
+        try:
+            self.connection.request("POST", PathAppend, headers=self.Headers, body=jdata)
+        except Exception:
+            raise Http404("Error sending data to backend")
+        # self.__ChkpCheckHTTPReturnCode()
+        conn = self.connection.getresponse()
+        self.ChkpCheckHTTPReturnCode(conn)
+        #response = json.loads(self.connection.getresponse().read().decode())
+        response = json.loads(conn.read().decode())
+        if len(response['sid']) <= 0:
+            raise Http404("sid data invalid")
+        else:
+            self.Headers.update({'X-chkp-sid': str(response['sid'])})
+        return response['sid']
+
+    def ZeroTouchAddTemplate(self, name, adminpassword,accountid,  timezone="GMT-06:00(Guadalajara/Mexico-City/Monterrey)",
+                            wirelesscountry="MX",adminaccess="", limitsource="LIMIT_SRC_IP_MODE.NO_LIMIT"):
+        c = 'add-template'
+        PathAppend = self.ZeroTouchURI +c
+        data = {
+            'name': name,
+            'time-zone': timezone,
+            'wireless-country': wirelesscountry,
+            'admin-password': adminpassword,
+            'account-id': accountid,
+            'admin-access': adminaccess,
+            'limit-source-ip-mode': limitsource,
+            'accept-wan': True
+        }
+        jdata = json.JSONEncoder().encode(data)
+        self.ChkpValidateSID()
+        self.ChkpValidConnection(PathAppend, jdata)
+        conn = self.connection.getresponse()
+        self.ChkpCheckHTTPReturnCode(conn)
+        response = json.loads(conn.read().decode())
+        return response
+
+    def ZeroTouchClaimGW(self, objname, accid, templateid, mac):
+        c = 'claim-gateway'
+        PathAppend = self.ZeroTouchURI +c
+        data = {
+            'object-name': objname,
+            'account-id': accid,
+            'template-id': templateid,
+            'mac': mac
+        }
+        jdata = json.JSONEncoder().encode(data)
+        self.ChkpValidateSID()
+        self.ChkpValidConnection(PathAppend, jdata)
+        conn = self.connection.getresponse()
+        self.ChkpCheckHTTPReturnCode(conn)
+        response = json.loads(conn.read().decode())
+        return response
 
 class apiv1_1(CheckPointAPI):
     apiVersion = 'v1.1'
