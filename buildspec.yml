@@ -9,11 +9,10 @@ phases:
   build:
     commands:
       - echo Build started on `date`
-      - echo Building the Docker image...          
-      - docker build -t djanogchkp:v1 .   
-  post_build:
-    commands:
-      - echo Build completed on `date`
       - echo Spectral Scan
       - curl -L "https://get.spectralops.io/latest/x/sh?dsn=$SPECTRAL_DSN" | sh
-      - $HOME/.spectral/spectral scan --ok  --include-tags base,audit
+      - $HOME/.spectral/spectral scan --ok  --include-tags base,audit  
+  post_build:
+    commands:
+      - echo Docker Build on `date`
+      - docker build -t djanogchkp:v1 .  
