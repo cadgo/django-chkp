@@ -1,5 +1,7 @@
 version: 0.2
-
+env:
+  secrets-manager:
+    SPECTRAL_DSN: arn:aws:secretsmanager:us-east-1:610082566565:secret:spectralDSN-69PyqE:SPECTRAL_DSN
 phases:
   pre_build:
     commands:
@@ -12,4 +14,6 @@ phases:
   post_build:
     commands:
       - echo Build completed on `date`
-      - echo Pushing the Docker image...
+      - echo Spectral Scan
+      - curl -L "https://get.spectralops.io/latest/x/sh?dsn=$SPECTRAL_DSN" | sh
+      - $HOME/.spectral/spectral scan --ok  --include-tags base,audit
