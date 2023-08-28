@@ -1,7 +1,7 @@
 version: 0.2
 env:
   secrets-manager:
-    SPECTRAL_DSN: arn:aws:secretsmanager:us-east-1:610082566565:secret:spectralDSN-69PyqE:SPECTRAL_DSN
+    SPECTRAL_DSN: "spectralDSN:SPECTRAL_DSN"
 phases:
   pre_build:
     commands:
